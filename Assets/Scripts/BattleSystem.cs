@@ -1,6 +1,7 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
@@ -130,5 +131,9 @@ public class BattleSystem : MonoBehaviour
             return;
 
         StartCoroutine(PlayerAction(action));
+    }
+
+    public void BackToMain() {
+        SceneManager.LoadScene("MainScene");
     }
 }
