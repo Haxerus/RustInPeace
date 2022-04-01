@@ -6,5 +6,5 @@ public abstract class Action : MonoBehaviour
 {
     public string actionName;
 
-    public abstract bool Effect(Unit user, Unit target);
+    public abstract bool Effect(BattleActor user, BattleActor target);
 }

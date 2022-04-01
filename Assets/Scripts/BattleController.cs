@@ -1,11 +1,12 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
 public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
 
-public class BattleSystem : MonoBehaviour
+public class BattleController : MonoBehaviour
 {
     public BattleState state;
 
@@ -22,12 +23,17 @@ public class BattleSystem : MonoBehaviour
 
     public ActionHUD actionHUD;
 
-    Unit playerUnit;
-    Unit enemyUnit;
+    BattleActor playerActor;
+    BattleActor enemyActor;
 
     void Start()
     {
         state = BattleState.START;
+
+        GameObject playerDataObj = GameObject.Find("PlayerData");
+        PlayerData data = playerDataObj.GetComponent<PlayerData>();
+
+        Debug.Log(data.health);
 
         StartCoroutine(SetupBattle());
     }
@@ -35,17 +41,17 @@ public class BattleSystem : MonoBehaviour
     IEnumerator SetupBattle()
     {
         GameObject playerObj = Instantiate(playerPrefab, playerBattleStation);
-        playerUnit = playerObj.GetComponent<Unit>();
+        playerActor = playerObj.GetComponent<BattleActor>();
 
         GameObject enemyObj = Instantiate(enemyPrefab, enemyBattleStation);
-        enemyUnit = enemyObj.GetComponent<Unit>();
+        enemyActor = enemyObj.GetComponent<BattleActor>();
 
-        descText.text = enemyUnit.unitName + " suddenly attacked!";
+        descText.text = enemyActor.displayName + " suddenly attacked!";
 
-        playerHUD.SetHUD(playerUnit);
-        enemyHUD.SetHUD(enemyUnit);
+        playerHUD.SetHUD(playerActor);
+        enemyHUD.SetHUD(enemyActor);
 
-        actionHUD.SetActions(playerUnit.actions);
+        actionHUD.SetActions(playerActor.actions);
 
         yield return new WaitForSeconds(2f);
 
@@ -56,12 +62,12 @@ public class BattleSystem : MonoBehaviour
     {
         actionHUD.SetEnabled(false);
 
-        descText.text = playerUnit.unitName + " used " + playerUnit.actions[action].actionName + "!";
+        descText.text = playerActor.displayName + " used " + playerActor.actions[action].actionName + "!";
 
-        bool enemyDead = playerUnit.actions[action].Effect(playerUnit, enemyUnit);
+        bool enemyDead = playerActor.actions[action].Effect(playerActor, enemyActor);
 
-        playerHUD.SetHP(playerUnit.currentHP);
-        enemyHUD.SetHP(enemyUnit.currentHP);
+        playerHUD.SetHP(playerActor.currentHP);
+        enemyHUD.SetHP(enemyActor.currentHP);
         
         yield return new WaitForSeconds(2f);
 
@@ -82,14 +88,14 @@ public class BattleSystem : MonoBehaviour
     IEnumerator EnemyTurn()
     {
         int action = Random.Range(0, 3);
-        descText.text = enemyUnit.unitName + " used " + enemyUnit.actions[action].actionName + "!";
+        descText.text = enemyActor.displayName + " used " + enemyActor.actions[action].actionName + "!";
 
         //yield return new WaitForSeconds(1f);
 
-        bool playerDead = enemyUnit.actions[action].Effect(enemyUnit, playerUnit);
+        bool playerDead = enemyActor.actions[action].Effect(enemyActor, playerActor);
 
-        playerHUD.SetHP(playerUnit.currentHP);
-        enemyHUD.SetHP(enemyUnit.currentHP);
+        playerHUD.SetHP(playerActor.currentHP);
+        enemyHUD.SetHP(enemyActor.currentHP);
 
         yield return new WaitForSeconds(2f);
 
@@ -130,5 +136,9 @@ public class BattleSystem : MonoBehaviour
             return;
 
         StartCoroutine(PlayerAction(action));
+    }
+
+    public void BackToMain() {
+        SceneManager.LoadScene("MainScene");
     }
 }
