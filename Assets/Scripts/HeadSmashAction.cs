@@ -6,7 +6,7 @@ public class HeadSmashAction : Action
 {
     public int power;
 
-    public override bool Effect(Unit user, Unit target)
+    public override bool Effect(BattleActor user, BattleActor target)
     {
         int dmg = user.attack + power - target.defense;
         bool targetDead = target.TakeDamage(dmg);

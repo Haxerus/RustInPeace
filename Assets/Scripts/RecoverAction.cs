@@ -7,7 +7,7 @@ public class RecoverAction : Action
 {
     public int healing;
 
-    public override bool Effect(Unit user, Unit target)
+    public override bool Effect(BattleActor user, BattleActor target)
     {
         user.currentHP = Math.Min(user.currentHP + healing, user.maxHP);
 
