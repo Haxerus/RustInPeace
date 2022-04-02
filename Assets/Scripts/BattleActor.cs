@@ -2,16 +2,18 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 
-public class Unit : MonoBehaviour
+public class BattleActor : MonoBehaviour
 {
-    public string unitName;
+    public string displayName;
 
-    public int attack;
-    public int defense;
-
+    // Stats
     public int maxHP;
     public int currentHP;
 
+    public int attack;
+    public int defense;
+    public int speed;
+    
     public List<Action> actions;
 
     public bool TakeDamage(int damage)

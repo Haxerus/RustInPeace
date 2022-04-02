@@ -44,11 +44,12 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 650228e1e5d94874a9bda1cbc493773e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  unitName: Robo-GigaDoge 9001
-  attack: 8
-  defense: 8
+  displayName: Robo-GigaDoge 9001
   maxHP: 50
   currentHP: 50
+  attack: 8
+  defense: 8
+  speed: 0
   actions:
   - {fileID: 1623264389953929001, guid: a2f16ebd5a4508148a5ebf6f3cbad7c2, type: 3}
   - {fileID: 1623264389953929001, guid: a2f16ebd5a4508148a5ebf6f3cbad7c2, type: 3}
