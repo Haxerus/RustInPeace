@@ -45,4 +45,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   actionName: Defend
   type: 1
-  defense: 5
+  defense: 8

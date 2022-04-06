@@ -8,11 +8,11 @@ public class BasicAttackAction : Action
 
     public override void Effect(BattleActor user, BattleActor target)
     {
-        /*float dmgReduction = 1.0f - (target.GetModifiedDefense() / 100.0f + Mathf.Abs(target.GetModifiedDefense())); 
+        float dmgReduction = 25.0f / (25.0f + target.GetModifiedDefense());
         int damage = Mathf.FloorToInt((user.GetModifiedAttack() + power) * dmgReduction);
 
-        Debug.Log(damage);*/
-        
-        target.TakeDamage(1);
+        Debug.Log("Attack damage: " + damage);
+
+        target.TakeDamage(damage);
     }
 }

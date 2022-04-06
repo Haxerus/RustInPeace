@@ -156,7 +156,6 @@ public class BattleController : MonoBehaviour
             case 2:
                 yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
                 yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
-                //yield return StartCoroutine(DisplayText(enemyActor.displayName + "tried to counterattack!"));
                 yield return StartCoroutine(DisplayText("But nothing happened!"));
                 break;
         }

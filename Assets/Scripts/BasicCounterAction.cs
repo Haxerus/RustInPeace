@@ -8,12 +8,12 @@ public class BasicCounterAction : Action
 
     public override void Effect(BattleActor user, BattleActor target)
     {
-        /*float spdMod = 1.0f + Mathf.Log10(1.0f + (user.GetModifiedSpeed() / target.GetModifiedSpeed()));
-        float halfDef =  target.GetModifiedDefense() >= 0 ? target.GetModifiedDefense() / 2.0f  : target.GetModifiedDefense() * 1.5f;
-        float dmgReduction = 1.0f - (halfDef / 100.0f + Mathf.Abs(halfDef));
-        int damage = Mathf.FloorToInt((user.GetModifiedAttack() + power) * spdMod * dmgReduction);*/
-        
-        target.TakeDamage(1);
+        float dmgReduction = 25.0f / (25.0f + target.GetModifiedDefense());
+        int damage = Mathf.FloorToInt((user.GetModifiedAttack() + power) * 1.5f * dmgReduction);
+
+        Debug.Log("Counterattack damage: " + damage);
+
+        target.TakeDamage(damage);
     }
 
 
