@@ -7,7 +7,10 @@ public class ToolClass : ItemClass
 {
     [Header("Tool")]
     public ToolType toolType;
-    public int toolDamage;
+    public int Health;
+    public int Attack;
+    public int Defense;
+    public int Speed;
 
     public enum ToolType
     {
