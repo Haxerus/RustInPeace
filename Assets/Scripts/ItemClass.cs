@@ -8,6 +8,7 @@ public abstract class ItemClass : ScriptableObject
     public string Name;
     public Sprite Sprite;
     public bool isStackable = true;
+    public int Price;
 
     public abstract ConsumableClass GetConsumable();
     public abstract ItemClass GetItem();

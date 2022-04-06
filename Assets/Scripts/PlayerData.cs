@@ -16,8 +16,8 @@ public class PlayerData : MonoBehaviour
     public int speed { get; set; }
 
     // TODO: Replace int with Item object
-    private List<int> inventory = new List<int>();
-    private int[] equipped = new int[4];
+    private List<ItemClass> inventory = new List<ItemClass>();
+    private List<ItemClass> equipped = new List<ItemClass>();
         
     void Awake()
     {
@@ -32,16 +32,16 @@ public class PlayerData : MonoBehaviour
         speed = 5;
     }
 
-    void AddItem(int item)
+    void AddItem(ItemClass item)
     {
         inventory.Add(item);
     }
 
-    void EquipItem(int item, int slot)
+    /*void EquipItem(ItemClass item, SlotClass slot)
     {
         if (slot < 0 || slot > equipped.Length)
             return;
 
         equipped[slot] = item;
-    }
+    }*/
 }
