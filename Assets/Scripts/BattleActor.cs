@@ -4,25 +4,71 @@ using UnityEngine;
 
 public class BattleActor : MonoBehaviour
 {
-    public string displayName { get; set; }
+    public string displayName;
 
     // Stats
-    public int maxHP { get; set; }
-    public int currentHP { get; set; }
+    public int maxHP;
+    public int currentHP;
 
-    public int attack { get; set; }
-    public int defense { get; set; }
-    public int speed { get; set; }
+    public int attack;
+    public int defense;
+    public int speed;
 
-    public List<Action> actions { get; set; }
+    // Temporary stat modifiers, cleared after each turn
+    int attMod = 0;
+    int defMod = 0;
+    int spdMod = 0;
 
-    public bool TakeDamage(int damage)
+    public List<Action> actions;
+
+    bool dead;
+
+    public void TakeDamage(int damage)
     {
         currentHP -= damage;
 
         if (currentHP <= 0)
-            return true;
+            dead = true;
+    }
 
-        return false;
+    public void ModifyAttack(int mod)
+    {
+        attMod = mod;
+    }
+
+    public void ModifyDefense(int mod)
+    {
+        defMod = mod;
+    }
+
+    public void ModifySpeed(int mod)
+    {
+        spdMod = mod;
+    }
+
+    public int GetModifiedAttack()
+    {
+        return attack + attMod;
+    }
+
+    public int GetModifiedDefense()
+    {
+        return defense + defMod;
+    }
+
+    public int GetModifiedSpeed()
+    {
+        return speed + spdMod;
+    }
+    public void ClearStatModifiers()
+    {
+        attMod = 0;
+        defMod = 0;
+        spdMod = 0;
+    }
+
+    public bool IsDead()
+    {
+        return dead;
     }
 }

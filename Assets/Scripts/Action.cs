@@ -9,5 +9,5 @@ public abstract class Action : MonoBehaviour
     public string actionName;
     public ActionType type;
 
-    public abstract bool Effect(BattleActor user, BattleActor target);
+    public abstract void Effect(BattleActor user, BattleActor target);
 }

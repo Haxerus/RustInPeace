@@ -34,7 +34,7 @@ public class PlayerData : MonoBehaviour
 
     void Start()
     {
-        playerName = "Default Name";
+        playerName = "Player";
         money = 100;
         experience = 0;
         level = 1;

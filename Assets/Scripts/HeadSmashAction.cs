@@ -6,12 +6,10 @@ public class HeadSmashAction : Action
 {
     public int power;
 
-    public override bool Effect(BattleActor user, BattleActor target)
+    public override void Effect(BattleActor user, BattleActor target)
     {
         int dmg = user.attack + power - target.defense;
-        bool targetDead = target.TakeDamage(dmg);
+        target.TakeDamage(dmg);
         user.TakeDamage(dmg / 8);
-
-        return targetDead;
     }
 }
