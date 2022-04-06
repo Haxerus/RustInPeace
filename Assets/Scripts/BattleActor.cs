@@ -4,17 +4,17 @@ using UnityEngine;
 
 public class BattleActor : MonoBehaviour
 {
-    public string displayName;
+    public string displayName { get; set; }
 
     // Stats
-    public int maxHP;
-    public int currentHP;
+    public int maxHP { get; set; }
+    public int currentHP { get; set; }
 
-    public int attack;
-    public int defense;
-    public int speed;
-    
-    public List<Action> actions;
+    public int attack { get; set; }
+    public int defense { get; set; }
+    public int speed { get; set; }
+
+    public List<Action> actions { get; set; }
 
     public bool TakeDamage(int damage)
     {

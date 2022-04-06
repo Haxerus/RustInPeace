@@ -1,22 +1,19 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
+public enum BattleState { START, INPUT, TURN, WON, LOST }
 
 public class BattleController : MonoBehaviour
 {
     public BattleState state;
 
-    public GameObject playerPrefab;
-    public GameObject enemyPrefab;
+    public GameObject player;
+    public GameObject enemy;
 
-    public Transform playerBattleStation;
-    public Transform enemyBattleStation;
-
-    public Text descText;
+    public Text battleText;
 
     public BattleHUD playerHUD;
     public BattleHUD enemyHUD;
@@ -26,43 +23,45 @@ public class BattleController : MonoBehaviour
     BattleActor playerActor;
     BattleActor enemyActor;
 
+    PlayerData playerData;
+
     void Start()
     {
         state = BattleState.START;
 
         GameObject playerDataObj = GameObject.Find("PlayerData");
-        PlayerData data = playerDataObj.GetComponent<PlayerData>();
-
-        Debug.Log(data.health);
+        playerData = playerDataObj.GetComponent<PlayerData>();
 
         StartCoroutine(SetupBattle());
     }
 
     IEnumerator SetupBattle()
     {
-        GameObject playerObj = Instantiate(playerPrefab, playerBattleStation);
-        playerActor = playerObj.GetComponent<BattleActor>();
+        CreatePlayer();
+        CreateEnemy();
 
-        GameObject enemyObj = Instantiate(enemyPrefab, enemyBattleStation);
-        enemyActor = enemyObj.GetComponent<BattleActor>();
+        Texture2D tex = Resources.Load<Texture2D>("Sprites/dog");
+        SpriteRenderer playerSR = player.GetComponent<SpriteRenderer>();
+        playerSR.sprite = Sprite.Create(tex, new Rect(0.0f, 0.0f, tex.width, tex.height), new Vector2(0.40f, 0.15f));
 
-        descText.text = enemyActor.displayName + " suddenly attacked!";
+        battleText.text = enemyActor.displayName + " suddenly attacked!";
 
         playerHUD.SetHUD(playerActor);
         enemyHUD.SetHUD(enemyActor);
 
-        actionHUD.SetActions(playerActor.actions);
+        /*
+        actionHUD.SetActions(playerActor.actions);*/
 
         yield return new WaitForSeconds(2f);
 
-        PlayerTurn();
+        WaitForInput();
     }
 
     IEnumerator PlayerAction(int action)
     {
         actionHUD.SetEnabled(false);
 
-        descText.text = playerActor.displayName + " used " + playerActor.actions[action].actionName + "!";
+        battleText.text = playerActor.displayName + " used " + playerActor.actions[action].actionName + "!";
 
         bool enemyDead = playerActor.actions[action].Effect(playerActor, enemyActor);
 
@@ -78,7 +77,7 @@ public class BattleController : MonoBehaviour
         }
         else
         {
-            state = BattleState.ENEMYTURN;
+            state = BattleState.TURN;
             StartCoroutine(EnemyTurn());
         }
 
@@ -88,7 +87,7 @@ public class BattleController : MonoBehaviour
     IEnumerator EnemyTurn()
     {
         int action = Random.Range(0, 3);
-        descText.text = enemyActor.displayName + " used " + enemyActor.actions[action].actionName + "!";
+        battleText.text = enemyActor.displayName + " used " + enemyActor.actions[action].actionName + "!";
 
         //yield return new WaitForSeconds(1f);
 
@@ -106,15 +105,21 @@ public class BattleController : MonoBehaviour
         }
         else
         {
-            state = BattleState.PLAYERTURN;
-            PlayerTurn();
+            state = BattleState.INPUT;
         }
     }
 
-    void PlayerTurn()
+    IEnumerator ProcessTurn(Action playerAction)
     {
-        state = BattleState.PLAYERTURN;
-        descText.text = "Choosing an action...";
+        
+
+        yield return new WaitForSeconds(2f);
+    }
+
+    void WaitForInput()
+    {
+        state = BattleState.INPUT;
+        battleText.text = "Choosing an action...";
         actionHUD.SetEnabled(true);
     }
 
@@ -122,17 +127,17 @@ public class BattleController : MonoBehaviour
     {
         if (state == BattleState.WON)
         {
-            descText.text = "You won!";
+            battleText.text = "You won!";
         }
         else if (state == BattleState.LOST)
         {
-            descText.text = "The battle was lost...";
+            battleText.text = "The battle was lost...";
         }
     }
 
     public void OnAction(int action)
     {
-        if (state != BattleState.PLAYERTURN)
+        if (state != BattleState.INPUT)
             return;
 
         StartCoroutine(PlayerAction(action));
@@ -140,5 +145,29 @@ public class BattleController : MonoBehaviour
 
     public void BackToMain() {
         SceneManager.LoadScene("MainScene");
+    }
+
+    private void CreatePlayer()
+    {
+        playerActor = player.GetComponent<BattleActor>();
+
+        playerActor.displayName = playerData.playerName;
+        playerActor.maxHP = playerData.health;
+        playerActor.currentHP = playerData.health;
+        playerActor.attack = playerData.attack;
+        playerActor.defense = playerData.defense;
+        playerActor.speed = playerData.speed;
+    }
+
+    private void CreateEnemy()
+    {
+       enemyActor = enemy.GetComponent<BattleActor>();
+
+        enemyActor.displayName = "p-bot";
+        enemyActor.maxHP = 8;
+        enemyActor.currentHP = 8;
+        enemyActor.attack = 2;
+        enemyActor.defense = 2;
+        enemyActor.speed = 3;
     }
 }
