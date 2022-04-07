@@ -1,3 +1,4 @@
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
@@ -7,23 +8,50 @@ public class Tooltip : MonoBehaviour
 {
     public GameObject statGroup;
     public GameObject modifierText;
+
+    public Text itemName;
     
     Item item;
 
     void RefreshUI()
     {
+        itemName.text = "---";
         ClearStatGroup();
-        
-        for (int i = 0; i < 5; i++)
+
+        if (item == null)
+            return;
+
+        itemName.text = item.name;
+
+        if (item is Equipment)
         {
-            GameObject mod = Instantiate(modifierText, statGroup.transform);
+            Equipment eq = item as Equipment;
+            foreach (Stat s in eq.stats)
+            {
+                GameObject mod = Instantiate(modifierText, statGroup.transform);
+
+                Text text = mod.GetComponent<Text>();
+
+                string sign = s.value >= 0 ? "+" : "-";
+                string modText = String.Format("{0}: {1}{2}", s.name, sign, s.value);
+                text.text = modText;
+            }
         }
     }
 
     public void UpdateItem(Item i)
     {
         item = i;
-        RefreshUI();
+
+        if (item)
+        {
+            RefreshUI();
+            gameObject.SetActive(true);
+        }
+        else
+        {
+            gameObject.SetActive(false);
+        }
     }
 
     private void ClearStatGroup()

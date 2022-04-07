@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tier1Legs
   m_EditorClassIdentifier: 
   name: Overclocked Drive
-  sprite: {fileID: 21300000, guid: b1e4d0cf6a46b234d8af537b701a77bf, type: 3}
+  sprite: {fileID: 21300000, guid: 63bdbbfb028025847aea784a3c7cb216, type: 3}
   price: 20
   slot: 2
   stats:

@@ -128,19 +128,11 @@ public class InventoryController : MonoBehaviour
         tooltipObj.SetActive(false);
         if (id < 100)
         {
-            if (invData.GetItem(id) != null)
-            {
-                tooltipObj.SetActive(entered);
-                tooltip.UpdateItem(cursor);
-            }
+            tooltip.UpdateItem(invData.GetItem(id));
         }
         else
         {
-            if (invData.GetEquipment(id - 100) != null)
-            {
-                tooltipObj.SetActive(entered);
-                tooltip.UpdateItem(cursor);
-            }
+            tooltip.UpdateItem(invData.GetEquipment(id - 100));
         }
     }
 

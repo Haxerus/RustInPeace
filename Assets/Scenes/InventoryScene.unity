@@ -1175,6 +1175,7 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   statGroup: {fileID: 1711356321}
   modifierText: {fileID: 2730996391851111448, guid: f69fb50bf30d3c147a2ed15307654194, type: 3}
+  itemName: {fileID: 1278655775}
 --- !u!1 &611586983
 GameObject:
   m_ObjectHideFlags: 0
@@ -1684,7 +1685,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 300, y: 4}
+  m_SizeDelta: {x: 320, y: 4}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1185069973
 MonoBehaviour:
@@ -1979,7 +1980,7 @@ RectTransform:
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
   m_AnchoredPosition: {x: 0, y: 0}
-  m_SizeDelta: {x: 320, y: 48}
+  m_SizeDelta: {x: 256, y: 48}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1278655775
 MonoBehaviour:
@@ -3076,7 +3077,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0, y: 0}
   m_AnchorMax: {x: 0, y: 0}
-  m_AnchoredPosition: {x: 0, y: 0}
+  m_AnchoredPosition: {x: 160, y: 0}
   m_SizeDelta: {x: 300, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &1711356323
