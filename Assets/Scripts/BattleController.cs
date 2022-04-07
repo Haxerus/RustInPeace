@@ -1,6 +1,5 @@
 using System.Collections;
 using UnityEngine;
-using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
@@ -73,7 +72,7 @@ public class BattleController : MonoBehaviour
 
     void ExecuteAction(Action action, BattleActor user, BattleActor target)
     {
-        battleText.text = user.displayName + " used " + action.actionName + "!";
+        battleText.text = user.displayName + " used " + action.name + "!";
         action.Effect(user, target);
     }
 
@@ -99,11 +98,11 @@ public class BattleController : MonoBehaviour
             turnOrder = Random.Range(0, 2) == 0 ? 0 : 1;
 
         // Counterattacks have priority
-        if (playerAction.type == ActionType.COUNTER && enemyAction.type == ActionType.COUNTER)
+        if (playerAction.type == Action.ActionType.COUNTER && enemyAction.type == Action.ActionType.COUNTER)
             turnOrder = 2;
-        else if (enemyAction.type == ActionType.COUNTER && playerAction.type != ActionType.COUNTER)
+        else if (enemyAction.type == Action.ActionType.COUNTER && playerAction.type != Action.ActionType.COUNTER)
             turnOrder = 1;
-        else if (playerAction.type == ActionType.COUNTER && enemyAction.type != ActionType.COUNTER)
+        else if (playerAction.type == Action.ActionType.COUNTER && enemyAction.type != Action.ActionType.COUNTER)
             turnOrder = 0;
 
         switch (turnOrder)
@@ -111,7 +110,7 @@ public class BattleController : MonoBehaviour
             case 0:
                 yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
 
-                if (playerAction.type == ActionType.COUNTER && enemyAction.type != ActionType.ATTACK)
+                if (playerAction.type == Action.ActionType.COUNTER && enemyAction.type != Action.ActionType.ATTACK)
                 {
                     yield return StartCoroutine(DisplayText("But it failed!"));
                 }
@@ -132,7 +131,7 @@ public class BattleController : MonoBehaviour
             case 1:
                 yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
 
-                if (enemyAction.type == ActionType.COUNTER && playerAction.type != ActionType.ATTACK)
+                if (enemyAction.type == Action.ActionType.COUNTER && playerAction.type != Action.ActionType.ATTACK)
                 {
                     yield return StartCoroutine(DisplayText("But it failed!"));
                 }
@@ -209,7 +208,7 @@ public class BattleController : MonoBehaviour
 
     private IEnumerator DisplayActionText(BattleActor user, Action action)
     {
-        battleText.text = user.displayName + " used " + action.actionName + "!";
+        battleText.text = user.displayName + " used " + action.name + "!";
         yield return new WaitForSeconds(1f);
     }
 

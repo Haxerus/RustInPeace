@@ -43,6 +43,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 5bba40ecd0e670f499346a9d6531d0a3, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionName: Defend
+  name: Defend
   type: 1
   defense: 8

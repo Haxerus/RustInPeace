@@ -11,8 +11,6 @@ public class BasicAttackAction : Action
         float dmgReduction = 25.0f / (25.0f + target.GetModifiedDefense());
         int damage = Mathf.FloorToInt((user.GetModifiedAttack() + power) * dmgReduction);
 
-        Debug.Log("Attack damage: " + damage);
-
         target.TakeDamage(damage);
     }
 }
