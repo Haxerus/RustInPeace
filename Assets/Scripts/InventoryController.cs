@@ -1,10 +1,14 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
+using UnityEngine.UI;
 
 public class InventoryController : MonoBehaviour
 {
     public GameObject cursorSlotObj;
+
+    public GameObject tooltipObj;
 
     Slot[] slots;
 
@@ -13,19 +17,20 @@ public class InventoryController : MonoBehaviour
     Slot legs;
 
     Slot cursorSlot;
-
     Item cursor;
 
-    InventoryData invData;
+    Tooltip tooltip;
 
-    Item test;
+    InventoryData invData;
 
     void Start()
     {
         GameObject invObj = GameObject.Find("InventoryData");
-        invData = invObj.GetComponent<InventoryData>();
+        if (invObj)
+            invData = invObj.GetComponent<InventoryData>();
 
         cursorSlot = cursorSlotObj.GetComponent<Slot>();
+        tooltip = tooltipObj.GetComponent<Tooltip>();
 
         int numSlots = GameObject.Find("Slots").transform.childCount;
         slots = new Slot[numSlots];
@@ -34,19 +39,21 @@ public class InventoryController : MonoBehaviour
         {
             GameObject slotObj = GameObject.Find("Slots").transform.GetChild(i).gameObject;
             slots[i] = slotObj.GetComponent<Slot>();
-            slots[i].AddClickListener(SlotListener);
+            slots[i].AddClickListener(ClickListener);
+            slots[i].AddHoverListener(HoverListener);
         }
 
         head = GameObject.Find("HeadSlot").GetComponent<Slot>();
-        head.AddClickListener(SlotListener);
+        head.AddClickListener(ClickListener);
+        head.AddHoverListener(HoverListener);
 
         body = GameObject.Find("BodySlot").GetComponent<Slot>();
-        body.AddClickListener(SlotListener);
+        body.AddClickListener(ClickListener);
+        body.AddHoverListener(HoverListener);
 
         legs = GameObject.Find("LegSlot").GetComponent<Slot>();
-        legs.AddClickListener(SlotListener);
-
-        test = Resources.Load<Item>("Items/Tier1Head");
+        legs.AddClickListener(ClickListener);
+        legs.AddHoverListener(HoverListener);
 
         RefreshUI();
     }
@@ -56,8 +63,7 @@ public class InventoryController : MonoBehaviour
         Vector3 screenPos = Input.mousePosition;
         screenPos.z = 10;
         cursorSlotObj.transform.position = Camera.main.ScreenToWorldPoint(screenPos);
-
-        Debug.Log(invData.GetItem(1));
+        tooltipObj.transform.position = Camera.main.ScreenToWorldPoint(screenPos);
 
         RefreshUI();
     }
@@ -88,7 +94,7 @@ public class InventoryController : MonoBehaviour
             legs.AddItem(invData.GetEquipment(2));
     }
 
-    void SlotListener(int id)
+    void ClickListener(int id)
     {
         // Regular Inventory 0 - 24
         // Equipment 100 - 102
@@ -113,6 +119,27 @@ public class InventoryController : MonoBehaviour
                     TransferEquipment(2);
                     RefreshUI();
                     break;
+            }
+        }
+    }
+
+    void HoverListener(int id, bool entered)
+    {
+        tooltipObj.SetActive(false);
+        if (id < 100)
+        {
+            if (invData.GetItem(id) != null)
+            {
+                tooltipObj.SetActive(entered);
+                tooltip.UpdateItem(cursor);
+            }
+        }
+        else
+        {
+            if (invData.GetEquipment(id - 100) != null)
+            {
+                tooltipObj.SetActive(entered);
+                tooltip.UpdateItem(cursor);
             }
         }
     }
@@ -167,5 +194,10 @@ public class InventoryController : MonoBehaviour
                 cursor = null;
             }
         }
+    }
+
+    public void BackToMain()
+    {
+        SceneManager.LoadScene("MainScene");
     }
 }

@@ -1248,9 +1248,8 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 0d5e8bacdc348f242b1547f357762ed8, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  inventoryItems: []
-  selectedItems: []
-  selectedUpgrades: []
+  inventory: []
+  equipment: []
 --- !u!1 &1910636530
 GameObject:
   m_ObjectHideFlags: 0

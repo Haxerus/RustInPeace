@@ -13,9 +13,12 @@ public class Slot : MonoBehaviour
 
     UnityEvent<int> clickEvent;
 
+    UnityEvent<int, bool> mouseMoveEvent;
+
     void Start()
     {
         clickEvent = new UnityEvent<int>();
+        mouseMoveEvent = new UnityEvent<int, bool>();
     }
 
     public void SetVisible(bool visible)
@@ -37,9 +40,29 @@ public class Slot : MonoBehaviour
         clickEvent.AddListener(listener);
     }
 
+    public void AddHoverListener(UnityAction<int, bool> listener)
+    {
+        mouseMoveEvent.AddListener(listener);
+    }
+
     void OnMouseDown()
     {
         clickEvent.Invoke(id);
+    }
+
+    void OnMouseOver()
+    {
+        mouseMoveEvent.Invoke(id, true);
+    }
+
+    void OnMouseEnter()
+    {
+        mouseMoveEvent.Invoke(id, true);
+    }
+
+    void OnMouseExit()
+    {
+        mouseMoveEvent.Invoke(id, false);
     }
 
     public Item GetItem()
