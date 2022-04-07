@@ -127,13 +127,12 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   displayName: R.U.S.T.Y.
-  maxHP: 20
-  currentHP: 20
-  attack: 5
-  defense: 5
-  speed: 0
+  maxHP: 10
+  currentHP: 10
+  attack: 1
+  defense: 1
+  speed: 1
   actions:
-  - {fileID: 1623264389953929001, guid: a2f16ebd5a4508148a5ebf6f3cbad7c2, type: 3}
-  - {fileID: 4598503081827622011, guid: 8a4056e5e58cc45438ae3ee15e782b5a, type: 3}
-  - {fileID: 1227488108623896565, guid: 23d9307c4bf408a4a9492e39848ae4a6, type: 3}
-  - {fileID: 5429763987997142525, guid: 694bf3c02c22a27438f0e4f20c961bc2, type: 3}
+  - {fileID: 1295419766949053647, guid: 2a6d1e84a85ff074c849b4a0bc1ddc6c, type: 3}
+  - {fileID: 4039537996948131066, guid: aac7a76049c68c64195714e35e6cf880, type: 3}
+  - {fileID: -6096235519615094503, guid: 8092e8a1678e16e46a6fa77990f93776, type: 3}

@@ -6,8 +6,8 @@ public class ThunderFangAction : Action
 {
     public int power;
 
-    public override bool Effect(BattleActor user, BattleActor target)
+    public override void Effect(BattleActor user, BattleActor target)
     {
-        return target.TakeDamage(user.attack + power - target.defense);
+        target.TakeDamage(user.attack + power - target.defense);
     }
 }

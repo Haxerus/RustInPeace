@@ -1,52 +1,49 @@
 using System.Collections;
-using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.Events;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
 
-public enum BattleState { START, PLAYERTURN, ENEMYTURN, WON, LOST }
+public enum BattleState { START, INPUT, TURN, WON, LOST }
 
 public class BattleController : MonoBehaviour
 {
     public BattleState state;
 
-    public GameObject playerPrefab;
-    public GameObject enemyPrefab;
+    public Text battleText;
 
-    public Transform playerBattleStation;
-    public Transform enemyBattleStation;
-
-    public Text descText;
+    public Transform playerPosition;
+    public Transform enemyPosition;
 
     public BattleHUD playerHUD;
     public BattleHUD enemyHUD;
 
     public ActionHUD actionHUD;
 
+    GameObject player;
+    GameObject enemy;
+
     BattleActor playerActor;
     BattleActor enemyActor;
+
+    PlayerData playerData;
 
     void Start()
     {
         state = BattleState.START;
 
         GameObject playerDataObj = GameObject.Find("PlayerData");
-        PlayerData data = playerDataObj.GetComponent<PlayerData>();
-
-        Debug.Log(data.health);
+        playerData = playerDataObj.GetComponent<PlayerData>();
 
         StartCoroutine(SetupBattle());
     }
 
     IEnumerator SetupBattle()
     {
-        GameObject playerObj = Instantiate(playerPrefab, playerBattleStation);
-        playerActor = playerObj.GetComponent<BattleActor>();
+        LoadPlayer();
+        LoadEnemy();
 
-        GameObject enemyObj = Instantiate(enemyPrefab, enemyBattleStation);
-        enemyActor = enemyObj.GetComponent<BattleActor>();
-
-        descText.text = enemyActor.displayName + " suddenly attacked!";
+        battleText.text = enemyActor.displayName + " suddenly attacked!";
 
         playerHUD.SetHUD(playerActor);
         enemyHUD.SetHUD(enemyActor);
@@ -55,66 +52,132 @@ public class BattleController : MonoBehaviour
 
         yield return new WaitForSeconds(2f);
 
-        PlayerTurn();
+        WaitForInput();
     }
 
-    IEnumerator PlayerAction(int action)
+    IEnumerator PlayerTurn(Action action)
     {
-        actionHUD.SetEnabled(false);
-
-        descText.text = playerActor.displayName + " used " + playerActor.actions[action].actionName + "!";
-
-        bool enemyDead = playerActor.actions[action].Effect(playerActor, enemyActor);
-
-        playerHUD.SetHP(playerActor.currentHP);
+        ExecuteAction(action, playerActor, enemyActor);
+        yield return new WaitForSeconds(1.0f);
         enemyHUD.SetHP(enemyActor.currentHP);
-        
-        yield return new WaitForSeconds(2f);
+        yield return new WaitForSeconds(1.0f);
+    }
 
-        if (enemyDead)
-        {
-            state = BattleState.WON;
-            EndBattle();
-        }
+    IEnumerator EnemyTurn(Action action)
+    {
+        ExecuteAction(action, enemyActor, playerActor);
+        yield return new WaitForSeconds(1.0f);
+        playerHUD.SetHP(playerActor.currentHP);
+        yield return new WaitForSeconds(1.0f);
+    }
+
+    void ExecuteAction(Action action, BattleActor user, BattleActor target)
+    {
+        battleText.text = user.displayName + " used " + action.actionName + "!";
+        action.Effect(user, target);
+    }
+
+    IEnumerator ProcessTurn(int action)
+    {
+        state = BattleState.TURN;
+
+        Action playerAction = playerActor.actions[action];
+        Action enemyAction = enemyActor.actions[Random.Range(0, enemyActor.actions.Count)];
+
+        // 0 = player first
+        // 1 = enemy first
+        // 2 = double counter
+        int turnOrder = 0;
+
+        // Determine turn order based on speed
+        // Resolve speed ties with a coin flip
+        if (playerActor.GetModifiedSpeed() > enemyActor.GetModifiedSpeed())
+            turnOrder = 0;
+        else if (enemyActor.GetModifiedSpeed() > playerActor.GetModifiedSpeed())
+            turnOrder = 1;
         else
+            turnOrder = Random.Range(0, 2) == 0 ? 0 : 1;
+
+        // Counterattacks have priority
+        if (playerAction.type == ActionType.COUNTER && enemyAction.type == ActionType.COUNTER)
+            turnOrder = 2;
+        else if (enemyAction.type == ActionType.COUNTER && playerAction.type != ActionType.COUNTER)
+            turnOrder = 1;
+        else if (playerAction.type == ActionType.COUNTER && enemyAction.type != ActionType.COUNTER)
+            turnOrder = 0;
+
+        switch (turnOrder)
         {
-            state = BattleState.ENEMYTURN;
-            StartCoroutine(EnemyTurn());
+            case 0:
+                yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
+
+                if (playerAction.type == ActionType.COUNTER && enemyAction.type != ActionType.ATTACK)
+                {
+                    yield return StartCoroutine(DisplayText("But it failed!"));
+                }
+                else
+                {
+                    playerAction.Effect(playerActor, enemyActor);
+                    enemyHUD.SetHP(enemyActor.currentHP);
+                }
+
+                if (!enemyActor.IsDead())
+                {
+                    yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
+                    enemyAction.Effect(enemyActor, playerActor);
+                    playerHUD.SetHP(playerActor.currentHP);
+                }
+
+                break;
+            case 1:
+                yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
+
+                if (enemyAction.type == ActionType.COUNTER && playerAction.type != ActionType.ATTACK)
+                {
+                    yield return StartCoroutine(DisplayText("But it failed!"));
+                }
+                else
+                {
+                    enemyAction.Effect(enemyActor, playerActor);
+                    playerHUD.SetHP(playerActor.currentHP);
+                }
+
+
+                if (!playerActor.IsDead())
+                {
+                    yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
+                    playerAction.Effect(playerActor, enemyActor);
+                    enemyHUD.SetHP(enemyActor.currentHP);
+                }
+
+                break;
+            case 2:
+                yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
+                yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
+                yield return StartCoroutine(DisplayText("But nothing happened!"));
+                break;
         }
 
-
-    }    
-
-    IEnumerator EnemyTurn()
-    {
-        int action = Random.Range(0, 3);
-        descText.text = enemyActor.displayName + " used " + enemyActor.actions[action].actionName + "!";
-
-        //yield return new WaitForSeconds(1f);
-
-        bool playerDead = enemyActor.actions[action].Effect(enemyActor, playerActor);
-
-        playerHUD.SetHP(playerActor.currentHP);
-        enemyHUD.SetHP(enemyActor.currentHP);
-
-        yield return new WaitForSeconds(2f);
-
-        if (playerDead)
-        {
+        if (playerActor.IsDead())
             state = BattleState.LOST;
-            EndBattle();
-        }
-        else
+        else if (enemyActor.IsDead())
+            state = BattleState.WON;
+
+        yield return new WaitForSeconds(1f);
+
+        if (state == BattleState.WON || state == BattleState.LOST)
         {
-            state = BattleState.PLAYERTURN;
-            PlayerTurn();
+            EndBattle();
+        } else
+        {
+            WaitForInput();
         }
     }
 
-    void PlayerTurn()
+    void WaitForInput()
     {
-        state = BattleState.PLAYERTURN;
-        descText.text = "Choosing an action...";
+        state = BattleState.INPUT;
+        battleText.text = "Choosing an action...";
         actionHUD.SetEnabled(true);
     }
 
@@ -122,23 +185,60 @@ public class BattleController : MonoBehaviour
     {
         if (state == BattleState.WON)
         {
-            descText.text = "You won!";
+            battleText.text = "You won!";
         }
         else if (state == BattleState.LOST)
         {
-            descText.text = "The battle was lost...";
+            battleText.text = "The battle was lost...";
         }
     }
 
     public void OnAction(int action)
     {
-        if (state != BattleState.PLAYERTURN)
+        if (state != BattleState.INPUT)
             return;
 
-        StartCoroutine(PlayerAction(action));
+        actionHUD.SetEnabled(false);
+
+        StartCoroutine(ProcessTurn(action));
     }
 
     public void BackToMain() {
         SceneManager.LoadScene("MainScene");
+    }
+
+    private IEnumerator DisplayActionText(BattleActor user, Action action)
+    {
+        battleText.text = user.displayName + " used " + action.actionName + "!";
+        yield return new WaitForSeconds(1f);
+    }
+
+    private IEnumerator DisplayText(string s)
+    {
+        battleText.text = s;
+        yield return new WaitForSeconds(1f);
+    }
+
+    private void LoadPlayer()
+    {
+        player = Resources.Load<GameObject>("Prefabs/Player");
+        Instantiate(player, playerPosition);
+
+        playerActor = player.GetComponent<BattleActor>();
+
+        playerActor.displayName = playerData.playerName;
+        playerActor.maxHP = playerData.health;
+        playerActor.currentHP = playerData.health;
+        playerActor.attack = playerData.attack;
+        playerActor.defense = playerData.defense;
+        playerActor.speed = playerData.speed;
+    }
+
+    private void LoadEnemy()
+    {
+        enemy = Resources.Load<GameObject>("Prefabs/EnemyDrone");
+        Instantiate(enemy, enemyPosition);
+
+        enemyActor = enemy.GetComponent<BattleActor>();
     }
 }
