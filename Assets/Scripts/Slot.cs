@@ -9,7 +9,7 @@ public class Slot : MonoBehaviour
 
     [SerializeField] private int id;
 
-    public Item item { get; set; }
+    Item item;
 
     UnityEvent<int> clickEvent;
 
@@ -21,7 +21,15 @@ public class Slot : MonoBehaviour
     public void SetVisible(bool visible)
     {
         gameObject.transform.GetChild(0).GetComponent<Image>().enabled = visible;
-        gameObject.transform.GetChild(1).GetComponent<Text>().enabled = visible;
+        //gameObject.transform.GetChild(1).GetComponent<Text>().enabled = visible;
+    }
+
+    void RefreshUI()
+    {
+        if (item)
+            gameObject.transform.GetChild(0).GetComponent<Image>().sprite = item.sprite;
+        else
+            gameObject.transform.GetChild(0).GetComponent<Image>().sprite = null;
     }
 
     public void AddClickListener(UnityAction<int> listener)
@@ -32,5 +40,29 @@ public class Slot : MonoBehaviour
     void OnMouseDown()
     {
         clickEvent.Invoke(id);
+    }
+
+    public Item GetItem()
+    {
+        return item;
+    }
+
+    public void AddItem(Item i)
+    {
+        item = i;
+        SetVisible(true);
+        RefreshUI();
+    }
+
+    public void RemoveItem()
+    {
+        item = null;
+        SetVisible(false);
+        RefreshUI();
+    }
+
+    public bool IsEmpty()
+    {
+        return item == null;
     }
 }
