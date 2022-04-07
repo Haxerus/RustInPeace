@@ -9,10 +9,13 @@ MonoBehaviour:
   m_GameObject: {fileID: 0}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 57de543d83281ce49a5878f301ff253a, type: 3}
-  m_Name: Stew
+  m_Script: {fileID: 11500000, guid: 52e134620d6e73f498e39ac6f51dc446, type: 3}
+  m_Name: Tier1Head
   m_EditorClassIdentifier: 
-  Name: Stew
-  Sprite: {fileID: 21300000, guid: 1840c558206bda1408d9f14f023a0c96, type: 3}
-  isStackable: 1
-  healthAdded: 10
+  name: Laser Fangs
+  sprite: {fileID: 21300000, guid: 3e62b19120b60f542893ef46ccdbe212, type: 3}
+  price: 20
+  slot: 1
+  stats:
+  - name: attack
+    value: 5

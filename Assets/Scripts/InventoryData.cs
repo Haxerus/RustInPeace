@@ -4,16 +4,14 @@ using UnityEngine;
 
 public class InventoryData : MonoBehaviour
 {
-    [SerializeField] private SlotClass[] inventoryItems;
-    [SerializeField] private SlotClass[] selectedItems;
-    [SerializeField] private SlotClass[] selectedUpgrades;
+    [SerializeField] private Item[] inventoryItems;
+    [SerializeField] private Item[] selectedItems;
+    [SerializeField] private Item[] selectedUpgrades;
 
     private static GameObject instance;
 
     void Start()
     {
-        InventoryController inventoryController = new InventoryController();
-        inventoryItems = inventoryController.GetInventoryItems();
         //Debug.Log(inventoryItems);
     }
 
