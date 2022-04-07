@@ -17,7 +17,7 @@ public class ActionHUD : MonoBehaviour
             if (actions[i])
             {
                 Text buttonText = buttons[i].GetComponentInChildren<Text>();
-                buttonText.text = actions[i].actionName;
+                buttonText.text = actions[i].name;
             }
         }
     }

@@ -43,6 +43,6 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 471cc4224b0e3d240b6841d5a0dd078b, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  actionName: Counterattack
+  name: Counter
   type: 2
   power: 3

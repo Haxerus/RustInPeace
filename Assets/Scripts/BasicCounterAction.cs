@@ -11,8 +11,6 @@ public class BasicCounterAction : Action
         float dmgReduction = 25.0f / (25.0f + target.GetModifiedDefense());
         int damage = Mathf.FloorToInt((user.GetModifiedAttack() + power) * 1.5f * dmgReduction);
 
-        Debug.Log("Counterattack damage: " + damage);
-
         target.TakeDamage(damage);
     }
 
