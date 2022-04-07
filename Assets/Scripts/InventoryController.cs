@@ -125,14 +125,20 @@ public class InventoryController : MonoBehaviour
 
     void HoverListener(int id, bool entered)
     {
-        tooltipObj.SetActive(false);
-        if (id < 100)
+        if (entered)
         {
-            tooltip.UpdateItem(invData.GetItem(id));
+            if (id < 100)
+            {
+                tooltip.UpdateItem(invData.GetItem(id));
+            }
+            else
+            {
+                tooltip.UpdateItem(invData.GetEquipment(id - 100));
+            }
         }
         else
         {
-            tooltip.UpdateItem(invData.GetEquipment(id - 100));
+            tooltip.UpdateItem(null);
         }
     }
 

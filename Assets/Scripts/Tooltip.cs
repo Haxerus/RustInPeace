@@ -42,15 +42,12 @@ public class Tooltip : MonoBehaviour
     public void UpdateItem(Item i)
     {
         item = i;
+        gameObject.SetActive(false);
 
         if (item)
         {
             RefreshUI();
             gameObject.SetActive(true);
-        }
-        else
-        {
-            gameObject.SetActive(false);
         }
     }
 

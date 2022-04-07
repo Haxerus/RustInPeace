@@ -13,7 +13,7 @@ MonoBehaviour:
   m_Name: Tier1Head
   m_EditorClassIdentifier: 
   name: Laser Fangs
-  sprite: {fileID: 21300000, guid: c600834a6996cc7488f16e243a3346a6, type: 3}
+  sprite: {fileID: 21300000, guid: 3e62b19120b60f542893ef46ccdbe212, type: 3}
   price: 20
   slot: 0
   stats:
