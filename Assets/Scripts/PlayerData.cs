@@ -20,15 +20,15 @@ public class PlayerData : MonoBehaviour
         
     void Awake()
     {
-        DontDestroyOnLoad(this.gameObject);
+        DontDestroyOnLoad(gameObject);
 
         if (instance == null)
         {
-            instance = this.gameObject;
+            instance = gameObject;
         }
         else
         {
-            Destroy(this.gameObject);
+            Destroy(gameObject);
         }
     }
 

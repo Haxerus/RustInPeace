@@ -89,8 +89,6 @@ public class BattleController : MonoBehaviour
         // 2 = double counter
         int turnOrder = 0;
 
-        bool playerFirst = false;
-
         // Determine turn order based on speed
         // Resolve speed ties with a coin flip
         if (playerActor.GetModifiedSpeed() > enemyActor.GetModifiedSpeed())
