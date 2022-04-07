@@ -2,30 +2,32 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.Events;
+using UnityEngine.UI;
 
 public class Slot : MonoBehaviour
 {
 
     [SerializeField] private int id;
 
+    public Item item { get; set; }
+
     UnityEvent<int> clickEvent;
 
-    // Start is called before the first frame update
     void Start()
     {
         clickEvent = new UnityEvent<int>();
     }
 
-    // Update is called once per frame
-    void Update()
+    public void SetVisible(bool visible)
     {
-        
+        gameObject.transform.GetChild(0).GetComponent<Image>().enabled = visible;
+        gameObject.transform.GetChild(1).GetComponent<Text>().enabled = visible;
     }
 
     public void AddClickListener(UnityAction<int> listener)
     {
         clickEvent.AddListener(listener);
-    } 
+    }
 
     void OnMouseDown()
     {
