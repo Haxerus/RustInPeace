@@ -8,11 +8,26 @@ public class InventoryData : MonoBehaviour
     [SerializeField] private SlotClass[] selectedItems;
     [SerializeField] private SlotClass[] selectedUpgrades;
 
-    public void Start()
+    private static GameObject instance;
+
+    void Start()
     {
         InventoryController inventoryController = new InventoryController();
         inventoryItems = inventoryController.GetInventoryItems();
         //Debug.Log(inventoryItems);
     }
 
+    void Awake()
+    {
+        DontDestroyOnLoad(gameObject);
+
+        if (instance == null)
+        {
+            instance = gameObject;
+        }
+        else
+        {
+            Destroy(gameObject);
+        }
+    }
 }
