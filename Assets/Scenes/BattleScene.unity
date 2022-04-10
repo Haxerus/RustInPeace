@@ -699,7 +699,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.3537736, g: 0.6796348, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -929,11 +929,9 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   state: 0
-  playerPrefab: {fileID: 7898477191600627572, guid: c3c4a885754ccf8478625aa65e7bbdab, type: 3}
-  enemyPrefab: {fileID: 160790864661906655, guid: de1f48c42d5a54342a6284b5380b88be, type: 3}
-  playerBattleStation: {fileID: 741443881}
-  enemyBattleStation: {fileID: 1178043865}
-  descText: {fileID: 665534854}
+  battleText: {fileID: 665534854}
+  playerPosition: {fileID: 741443881}
+  enemyPosition: {fileID: 1178043865}
   playerHUD: {fileID: 1036505133}
   enemyHUD: {fileID: 1218189710}
   actionHUD: {fileID: 459336696}
@@ -1219,9 +1217,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Action 2
-
-'
+  m_Text: -----
 --- !u!222 &1003858112
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -1533,7 +1529,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.8397603, g: 0.5235849, b: 1, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -1745,7 +1741,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.9716981, g: 0.38959593, b: 0.38959593, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2080,7 +2076,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: Action 1
+  m_Text: -----
 --- !u!222 &1349373133
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2315,9 +2311,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Action 4
-
-'
+  m_Text: -----
 --- !u!222 &1540753777
 CanvasRenderer:
   m_ObjectHideFlags: 0
@@ -2434,7 +2428,7 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   m_Material: {fileID: 0}
-  m_Color: {r: 1, g: 1, b: 1, a: 1}
+  m_Color: {r: 0.61681247, g: 1, b: 0.4669811, a: 1}
   m_RaycastTarget: 1
   m_RaycastPadding: {x: 0, y: 0, z: 0, w: 0}
   m_Maskable: 1
@@ -2529,9 +2523,7 @@ MonoBehaviour:
     m_HorizontalOverflow: 0
     m_VerticalOverflow: 0
     m_LineSpacing: 1
-  m_Text: 'Action 3
-
-'
+  m_Text: -----
 --- !u!222 &2024832497
 CanvasRenderer:
   m_ObjectHideFlags: 0

@@ -4,7 +4,10 @@ using UnityEngine;
 
 public abstract class Action : MonoBehaviour
 {
-    public string actionName;
+    public new string name;
+    public ActionType type;
 
-    public abstract bool Effect(BattleActor user, BattleActor target);
+    public enum ActionType { ATTACK, DEFENSE, COUNTER, SPECIAL }
+
+    public abstract void Effect(BattleActor user, BattleActor target);
 }
