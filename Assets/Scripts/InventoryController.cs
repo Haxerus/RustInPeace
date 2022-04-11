@@ -29,6 +29,8 @@ public class InventoryController : MonoBehaviour
         if (invObj)
             invData = invObj.GetComponent<InventoryData>();
 
+        tooltipObj.SetActive(false);
+
         cursorSlot = cursorSlotObj.GetComponent<Slot>();
         tooltip = tooltipObj.GetComponent<Tooltip>();
 
