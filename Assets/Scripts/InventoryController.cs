@@ -1,506 +1,203 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.SceneManagement;
 using UnityEngine.UI;
-using System;
 
 public class InventoryController : MonoBehaviour
 {
-    [SerializeField] private GameObject itemCursor;
+    public GameObject cursorSlotObj;
 
-    [SerializeField] private GameObject itemSlot;
-    [SerializeField] private GameObject upgradeSlot;
-    [SerializeField] private GameObject slotHolder;
-    [SerializeField] private ItemClass itemToAdd;
-    [SerializeField] private ItemClass itemToRemove;
+    public GameObject tooltipObj;
 
-    [SerializeField] private ItemClass item;
-    [SerializeField] private ItemClass upgrade;
+    Slot[] slots;
 
-    [SerializeField] private SlotClass[] startingItems;
+    Slot head;
+    Slot body;
+    Slot legs;
 
-    public SlotClass[] items;
-    public SlotClass[] itemSelected;
-    public SlotClass[] upgradeSelected;
+    Slot cursorSlot;
+    Item cursor;
 
-    public SlotClass[] allItems;
+    Tooltip tooltip;
 
-    private GameObject[] slots;
-    private GameObject[] itemSlots;
-    private GameObject[] upgradeSlots;
+    InventoryData invData;
 
-    private GameObject[] allSlots;
-
-    private SlotClass movingSlot;
-    private SlotClass tempSlot;
-    private SlotClass originalSlot;
-
-    bool isMovingItem;
-
-    void Awake()
+    void Start()
     {
-        DontDestroyOnLoad(this);
-    }
+        GameObject invObj = GameObject.Find("InventoryData");
+        if (invObj)
+            invData = invObj.GetComponent<InventoryData>();
 
-    public void Start()
-    {
-        //Creating the slots
-        slots = new GameObject[slotHolder.transform.childCount];
-        itemSlots = new GameObject[itemSlot.transform.childCount];
-        upgradeSlots = new GameObject[upgradeSlot.transform.childCount];
+        tooltipObj.SetActive(false);
 
-        int totLength = slots.Length + itemSlots.Length + upgradeSlots.Length;
-        allSlots = new GameObject[totLength];
+        cursorSlot = cursorSlotObj.GetComponent<Slot>();
+        tooltip = tooltipObj.GetComponent<Tooltip>();
 
-        items = new SlotClass[slots.Length];
-        itemSelected = new SlotClass[itemSlots.Length];
-        upgradeSelected = new SlotClass[upgradeSlots.Length];
+        int numSlots = GameObject.Find("Slots").transform.childCount;
+        slots = new Slot[numSlots];
 
-        int numItems = items.Length + itemSelected.Length + upgradeSelected.Length;
-        allItems = new SlotClass[numItems];
-
-        int l, j, k = 0;
-        for (l = 0; l < items.Length; l++)
-        {
-            items[l] = new SlotClass();
-            allItems[l] = items[l];
-        }
-        for (int i = 0; i < startingItems.Length; i++)
-        {
-            items[i] = startingItems[i];
-
-        }
-
-        for(j = 0; j < itemSelected.Length; j++)
-        {
-            itemSelected[j] = new SlotClass();
-        }
-
-        for (k = 0; k < upgradeSelected.Length; k++)
-        {
-            upgradeSelected[k] = new SlotClass();
-        }
-
-
-        //Initilizing the slots
-        for (l = 0; l < slotHolder.transform.childCount; l++)
-        {
-            slots[l] = slotHolder.transform.GetChild(l).gameObject;
-        }
-        for (j = 0; j < itemSlot.transform.childCount; j++)
-        {
-            itemSlots[j] = itemSlot.transform.GetChild(j).gameObject;
-        }
-        for (k = 0; k < upgradeSlot.transform.childCount; k++)
-        {
-            upgradeSlots[k] = upgradeSlot.transform.GetChild(k).gameObject;
-        }
-
-        RefreshUI();
-        Add(itemToAdd, 1);
-        Remove(itemToRemove);
-
-        AddItemToSelection(item, 1);
-        AddUpgradeToSelection(upgrade, 1);
-
-    }
-
-    private void Update()
-    {
-        itemCursor.SetActive(isMovingItem);
-        itemCursor.transform.position = Input.mousePosition;
-        if (isMovingItem)
-        {
-            itemCursor.GetComponent<Image>().sprite = movingSlot.GetItem().Sprite;
-        }
-
-        if (Input.GetMouseButtonDown(0)) //We clicked!
-        {
-            //Find the closest slot over the slot we clicked on
-            if (isMovingItem)
-            {
-                //End Item Move
-                EndItemMove();
-            }
-            else
-            {
-                BeginItemMove();
-            }
-        }
-    }
-
-    #region Inventory Utils
-    public void RefreshUI()
-    {
-
-        //For every slot
         for (int i = 0; i < slots.Length; i++)
         {
-            try
-            {
-                slots[i].transform.GetChild(0).GetComponent<Image>().enabled = true; //Enable the image
-                slots[i].transform.GetChild(0).GetComponent<Image>().sprite = items[i].GetItem().Sprite; //Set the image to the sprite
-
-                if (items[i].GetItem().isStackable) //Check if item is stackable
-                    slots[i].transform.GetChild(1).GetComponent<Text>().text = items[i].GetQuantity() + ""; //If so set the quantity to the number of items
-                else
-                    slots[i].transform.GetChild(1).GetComponent<Text>().text = ""; //If not set the quantity to blank
-            }
-            catch
-            {
-                //Empty slot
-                slots[i].transform.GetChild(0).GetComponent<Image>().sprite = null;
-                slots[i].transform.GetChild(0).GetComponent<Image>().enabled = false;
-                slots[i].transform.GetChild(1).GetComponent<Text>().text = "";
-            }
+            GameObject slotObj = GameObject.Find("Slots").transform.GetChild(i).gameObject;
+            slots[i] = slotObj.GetComponent<Slot>();
+            slots[i].AddClickListener(ClickListener);
+            slots[i].AddHoverListener(HoverListener);
         }
 
-        // For every item slot
-        for (int i = 0; i < itemSlots.Length; i++)
-        {
-            try
-            {
-                itemSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = true; //Enable the image
-                itemSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = itemSelected[i].GetItem().Sprite; //Set the image to the sprite
+        head = GameObject.Find("HeadSlot").GetComponent<Slot>();
+        head.AddClickListener(ClickListener);
+        head.AddHoverListener(HoverListener);
 
-                if (itemSelected[i].GetItem().isStackable) //Check if item is stackable
-                    itemSlots[i].transform.GetChild(1).GetComponent<Text>().text = itemSelected[i].GetQuantity() + ""; //If so set the quantity to the number of items
-                else
-                    itemSlots[i].transform.GetChild(1).GetComponent<Text>().text = ""; //If not set the quantity to blank
-            }
-            catch
-            {
-                //Empty slot
-                itemSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = null;
-                itemSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = false;
-                itemSlots[i].transform.GetChild(1).GetComponent<Text>().text = "";
-            }
-        }
+        body = GameObject.Find("BodySlot").GetComponent<Slot>();
+        body.AddClickListener(ClickListener);
+        body.AddHoverListener(HoverListener);
 
-        //for every upgrade slot
-        for (int i = 0; i < upgradeSlots.Length; i++)
-        {
-            try
-            {
-                upgradeSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = true; //Enable the image
-                upgradeSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = upgradeSelected[i].GetItem().Sprite; //Set the image to the sprite
+        legs = GameObject.Find("LegSlot").GetComponent<Slot>();
+        legs.AddClickListener(ClickListener);
+        legs.AddHoverListener(HoverListener);
 
-                if (upgradeSelected[i].GetItem().isStackable) //Check if item is stackable
-                    upgradeSlots[i].transform.GetChild(1).GetComponent<Text>().text = upgradeSelected[i].GetQuantity() + ""; //If so set the quantity to the number of upgradeSelected
-                else
-                    upgradeSlots[i].transform.GetChild(1).GetComponent<Text>().text = ""; //If not set the quantity to blank
-            }
-            catch
-            {
-                //Empty slot
-                upgradeSlots[i].transform.GetChild(0).GetComponent<Image>().sprite = null;
-                upgradeSlots[i].transform.GetChild(0).GetComponent<Image>().enabled = false;
-                upgradeSlots[i].transform.GetChild(1).GetComponent<Text>().text = "";
-            }
-        }
-
-        Array.Copy(slots, allSlots, slots.Length);
-        Array.Copy(itemSlots, 0, allSlots, slots.Length, itemSlots.Length);
-        Array.Copy(upgradeSlots, 0, allSlots, slots.Length + itemSlots.Length, upgradeSlots.Length);
-
-        Array.Copy(items, allItems, items.Length);
-        Array.Copy(itemSelected, 0, allItems, items.Length, itemSelected.Length);
-        Array.Copy(upgradeSelected, 0, allItems, items.Length + itemSelected.Length, upgradeSelected.Length);
+        RefreshUI();
     }
 
-    public bool AddItemToSelection(ItemClass item, int quantity)
+    void Update()
     {
-        SlotClass slot = Contains(item, 1); //Checks if the slots contain the specified item
-        if (slot != null && slot.GetItem().isStackable) //If item exists and is stackable
+        Vector3 screenPos = Input.mousePosition;
+        screenPos.z = 10;
+        cursorSlotObj.transform.position = Camera.main.ScreenToWorldPoint(screenPos);
+        tooltipObj.transform.position = Camera.main.ScreenToWorldPoint(screenPos);
+
+        RefreshUI();
+    }
+
+    void RefreshUI()
+    {
+        cursorSlot.RemoveItem();
+        if (cursor)
+            cursorSlot.AddItem(cursor);
+
+        for (int i = 0; i < slots.Length; i++)
         {
-            slot.AddQuantity(quantity);
+            slots[i].RemoveItem();
+            if (invData.GetItem(i))
+                slots[i].AddItem(invData.GetItem(i));
+        }
+
+        head.RemoveItem();
+        if (invData.GetEquipment(0))
+            head.AddItem(invData.GetEquipment(0));
+
+        body.RemoveItem();
+        if (invData.GetEquipment(1))
+            body.AddItem(invData.GetEquipment(1));
+
+        legs.RemoveItem();
+        if (invData.GetEquipment(2))
+            legs.AddItem(invData.GetEquipment(2));
+    }
+
+    void ClickListener(int id)
+    {
+        // Regular Inventory 0 - 24
+        // Equipment 100 - 102
+        if (id < 100)
+        {
+            TransferInventory(id);
+            RefreshUI();
         }
         else
         {
-            for (int i = 0; i < items.Length; i++)
+            switch (id)
             {
-                if (itemSelected[i].GetItem() == null)
-                {
-                    itemSelected[i].AddItem(item, 1);
-                    break;
-                }
-            }
-        }
-
-        RefreshUI();
-        return true;
-    }
-
-    public bool AddUpgradeToSelection(ItemClass item, int quantity)
-    {
-        SlotClass slot = Contains(item, 2); //Checks if the slots contain the specified item
-        if (slot != null && slot.GetItem().isStackable) //If item exists and is stackable
-        {
-            slot.AddQuantity(quantity);
-        }
-        else
-        {
-            for (int i = 0; i < items.Length; i++)
-            {
-                if (upgradeSelected[i].GetItem() == null)
-                {
-                    upgradeSelected[i].AddItem(item, 1);
-                    break;
-                }
-            }
-        }
-
-        RefreshUI();
-        return true;
-    }
-
-    public bool Add(ItemClass item, int quantity)
-    {
-        SlotClass slot = Contains(item, 0); //Checks if the slots contain the specified item
-        if (slot != null && slot.GetItem().isStackable) //If item exists and is stackable
-        {
-            slot.AddQuantity(quantity);
-        }
-        else
-        {
-            for (int i = 0; i < items.Length; i++)
-            {
-                if (items[i].GetItem() == null)
-                {
-                    items[i].AddItem(item, 1);
-                    break;
-                }
-            }
-        }
-
-        RefreshUI();
-        return true;
-    }
-
-    public bool Remove(ItemClass item)
-    {
-        SlotClass temp = Contains(item, 0); //Checks if the slots contain the specified item
-        if (temp != null) //Slot does contain item
-        {
-            if (temp.GetQuantity() > 1) //If quantity greater than 1
-                temp.SubQuantity(1); //Remove 1 from quantity
-            else
-            {
-                //Remove item
-                int slotToRemoveIndex = 0;
-
-                for (int i = 0; i < items.Length; i++)
-                {
-                    if (items[i].GetItem() == item)
-                    {
-                        slotToRemoveIndex = i;
-                        break;
-                    }
-                }
-                items[slotToRemoveIndex].Clear();
-            }
-        }
-        else
-        {
-            return false;
-        }
-
-        RefreshUI();
-        return true;
-    }
-
-    public bool RemoveFromItemSelection(ItemClass item)
-    {
-        SlotClass temp = Contains(item, 1); //Checks if the slots contain the specified item
-        if (temp != null) //Slot does contain item
-        {
-            if (temp.GetQuantity() > 1) //If quantity greater than 1
-                temp.SubQuantity(1); //Remove 1 from quantity
-            else
-            {
-                //Remove item
-                int slotToRemoveIndex = 0;
-
-                for (int i = 0; i < itemSelected.Length; i++)
-                {
-                    if (itemSelected[i].GetItem() == item)
-                    {
-                        slotToRemoveIndex = i;
-                        break;
-                    }
-                }
-                itemSelected[slotToRemoveIndex].Clear();
-            }
-        }
-        else
-        {
-            return false;
-        }
-
-        RefreshUI();
-        return true;
-    }
-
-    public bool RemoveFromUpgradeSelection(ItemClass item)
-    {
-        SlotClass temp = Contains(item, 2); //Checks if the slots contain the specified item
-        if (temp != null) //Slot does contain item
-        {
-            if (temp.GetQuantity() > 1) //If quantity greater than 1
-                temp.SubQuantity(1); //Remove 1 from quantity
-            else
-            {
-                //Remove item
-                int slotToRemoveIndex = 0;
-
-                for (int i = 0; i < upgradeSelected.Length; i++)
-                {
-                    if (upgradeSelected[i].GetItem() == item)
-                    {
-                        slotToRemoveIndex = i;
-                        break;
-                    }
-                }
-                upgradeSelected[slotToRemoveIndex].Clear();
-            }
-        }
-        else
-        {
-            return false;
-        }
-
-        RefreshUI();
-        return true;
-    }
-
-    public SlotClass Contains(ItemClass item, int type)
-    {
-        if (type == 0)
-        {
-            foreach (SlotClass slot in items)
-            {
-                if (slot.GetItem() == item)
-                {
-                    return slot;
-                }
-            }
-        }
-        else if (type == 1)
-        {
-            foreach (SlotClass slot in itemSelected)
-            {
-                if (slot.GetItem() == item)
-                {
-                    return slot;
-                }
-            }
-        }
-        else if (type == 2)
-        {
-            foreach (SlotClass slot in upgradeSelected)
-            {
-                if (slot.GetItem() == item)
-                {
-                    return slot;
-                }
-            }
-        }
-
-        return null;
-    }
-    #endregion
-
-    #region Moving Stuff
-    private bool BeginItemMove()
-    {
-        originalSlot = GetClosestSlot();
-        if (originalSlot == null || originalSlot.GetItem() == null)
-        {
-            return false;
-        }
-
-        movingSlot = new SlotClass(originalSlot);
-        originalSlot.Clear();
-        RefreshUI();
-        isMovingItem = true;
-        return true;
-    }
-
-    private bool EndItemMove()
-    {
-        originalSlot = GetClosestSlot();
-
-        if (originalSlot == null)
-        {
-            Add(movingSlot.GetItem(), movingSlot.GetQuantity());
-            Debug.Log(movingSlot.GetItem());
-            movingSlot.Clear();
-        }
-        else
-        {
-            if (originalSlot.GetItem() != null)
-            {
-                if (originalSlot.GetItem() == movingSlot.GetItem()) // They're the same time (they should stack)
-                {
-                    if (originalSlot.GetItem().isStackable)
-                    {
-                        originalSlot.AddQuantity(movingSlot.GetQuantity());
-                        movingSlot.Clear();
-                    }
-                    else
-                    {
-                        return false;
-                    }
-                }
-                else
-                {
-                    tempSlot = new SlotClass(originalSlot); // a = b
-                    originalSlot.AddItem(movingSlot.GetItem(), movingSlot.GetQuantity()); // b = c
-                    movingSlot.AddItem(tempSlot.GetItem(), tempSlot.GetQuantity()); // a = c
+                case 100:
+                    TransferEquipment(0);
                     RefreshUI();
-                    return true;
-                }
-            }
-            else // Place Item as Usual
-            {
-                originalSlot.AddItem(movingSlot.GetItem(), movingSlot.GetQuantity());
-                movingSlot.Clear();
+                    break;
+                case 101:
+                    TransferEquipment(1);
+                    RefreshUI();
+                    break;
+                case 102:
+                    TransferEquipment(2);
+                    RefreshUI();
+                    break;
             }
         }
-
-        isMovingItem = false;
-        RefreshUI();
-        return true;
-
     }
 
-    private SlotClass GetClosestSlot()
+    void HoverListener(int id, bool entered)
     {
-        for (int i = 0; i < allSlots.Length; i++)
+        if (entered)
         {
-            if (Vector2.Distance(allSlots[i].transform.position, Input.mousePosition) <= 32)
+            if (id < 100)
             {
-                return allItems[i];
+                tooltip.UpdateItem(invData.GetItem(id));
+            }
+            else
+            {
+                tooltip.UpdateItem(invData.GetEquipment(id - 100));
             }
         }
-        return null;
-    }
-    #endregion
-
-    #region Information Transfer
-    public SlotClass[] GetInventoryItems()
-    {
-        return items;
+        else
+        {
+            tooltip.UpdateItem(null);
+        }
     }
 
-    public SlotClass[] GetSelectedItems()
+    private void TransferInventory(int other)
     {
-        return itemSelected;
+        if (cursor != null && invData.GetItem(other) != null)
+        {
+            Item temp = invData.GetItem(other);
+
+            invData.RemoveItem(other);
+            invData.AddItem(cursor, other);
+
+            cursor = temp;
+        }
+        else if (cursor == null && invData.GetItem(other) != null)
+        {
+            cursor = invData.GetItem(other);
+            invData.RemoveItem(other);
+        }
+        else if (cursor != null && invData.GetItem(other) == null)
+        {
+            invData.AddItem(cursor, other);
+            cursor = null;
+        }
     }
 
-    public SlotClass[] GetSelectedUpgrades()
+    private void TransferEquipment(int slot)
     {
-        return upgradeSelected;
+        if (cursor != null && invData.GetEquipment(slot) != null)
+        {
+            if (cursor is Equipment && (int)(cursor as Equipment).slot == slot)
+            {
+                Item temp = invData.GetEquipment(slot);
+
+                invData.UnequipItem(slot);
+                invData.EquipItem(cursor, slot);
+
+                cursor = temp;
+            }
+        }
+        else if (cursor == null && invData.GetEquipment(slot) != null)
+        {
+            cursor = invData.GetEquipment(slot);
+            invData.UnequipItem(slot);
+        }
+        else if (cursor != null && invData.GetEquipment(slot) == null)
+        {
+            if (cursor is Equipment && (int)(cursor as Equipment).slot == slot)
+            {
+                invData.EquipItem(cursor, slot);
+                cursor = null;
+            }
+        }
     }
-    #endregion
+
+    public void BackToMain()
+    {
+        SceneManager.LoadScene("MainScene");
+    }
 }
