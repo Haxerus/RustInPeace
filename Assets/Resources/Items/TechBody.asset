@@ -1,0 +1,23 @@
+%YAML 1.1
+%TAG !u! tag:unity3d.com,2011:
+--- !u!114 &11400000
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 0}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 52e134620d6e73f498e39ac6f51dc446, type: 3}
+  m_Name: TechBody
+  m_EditorClassIdentifier: 
+  name: TechBody
+  sprite: {fileID: 21300000, guid: f52831420b9ccdb4a919155f5f2f1101, type: 3}
+  price: 500
+  slot: 1
+  equippedSprite: {fileID: 21300000, guid: 5a21725759c19bc479e8b52d3759c638, type: 3}
+  stats:
+  - name: defense
+    value: 40
+  action: {fileID: 0}
