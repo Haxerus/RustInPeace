@@ -198,6 +198,9 @@ public class InventoryController : MonoBehaviour
 
     public void BackToMain()
     {
+        if (cursor != null)
+            return;
+
         SceneManager.LoadScene("MainScene");
     }
 }
