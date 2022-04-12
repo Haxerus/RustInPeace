@@ -123,12 +123,8 @@ public class BattleActor : MonoBehaviour
 
         float spdMod = 1.0f - 1.0f / (1.0f + 0.001f * speed);
 
-        Debug.Log(spdMod);
-
         chance += spdMod;
         chance += crit / 100f;
-
-        Debug.Log(chance);
 
         return chance;
     }

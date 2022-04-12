@@ -190,6 +190,7 @@ public class BattleController : MonoBehaviour
 
             bool lvl = playerData.GainEXP(expReward);
             playerData.GainMoney(moneyReward);
+            playerData.battlesWon++;
 
             victoryHUD.UpdateHUD(moneyReward, expReward, lvl);
             victoryHUD.SetVisible(true);
@@ -197,7 +198,7 @@ public class BattleController : MonoBehaviour
         else if (state == BattleState.LOST)
         {
             battleText.text = "You were defeated. The battle was lost...";
-            lossHUD.SetActive(false);
+            lossHUD.SetActive(true);
         }
     }
 

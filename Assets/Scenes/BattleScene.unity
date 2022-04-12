@@ -3808,8 +3808,8 @@ MonoBehaviour:
     m_PersistentCalls:
       m_Calls:
       - m_Target: {fileID: 847175179}
-        m_TargetAssemblyTypeName: BattleSystem, Assembly-CSharp
-        m_MethodName: BackToMain
+        m_TargetAssemblyTypeName: BattleController, Assembly-CSharp
+        m_MethodName: ViewLeaderboard
         m_Mode: 1
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
