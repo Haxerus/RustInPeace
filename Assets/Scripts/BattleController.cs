@@ -99,6 +99,15 @@ public class BattleController : MonoBehaviour
         // Decide turn order
         bool playerFirst = true;
 
+        // Make speed actually do something
+        if (enemyAction.type == Action.ActionType.ATTACK && playerAction.type == Action.ActionType.ATTACK)
+        {
+            int playerSpd = playerActor.GetStat("speed");
+            int enemySpd = enemyActor.GetStat("speed");
+
+            playerFirst = playerSpd >= enemySpd;
+        }
+
         if (enemyAction.type == Action.ActionType.DEFENSE)
         {
             playerFirst = false;
