@@ -373,7 +373,7 @@ RectTransform:
   m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
   m_AnchorMin: {x: 0.5, y: 0}
   m_AnchorMax: {x: 0.5, y: 0}
-  m_AnchoredPosition: {x: 0, y: 103.3}
+  m_AnchoredPosition: {x: 0, y: 103.29999}
   m_SizeDelta: {x: 347.81, y: 0}
   m_Pivot: {x: 0.5, y: 0.5}
 --- !u!114 &262945528
@@ -575,6 +575,65 @@ CanvasRenderer:
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 299617088}
   m_CullTransparentMesh: 1
+--- !u!1 &394169808
+GameObject:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  serializedVersion: 6
+  m_Component:
+  - component: {fileID: 394169810}
+  - component: {fileID: 394169809}
+  m_Layer: 0
+  m_Name: Registry
+  m_TagString: Untagged
+  m_Icon: {fileID: 0}
+  m_NavMeshLayer: 0
+  m_StaticEditorFlags: 0
+  m_IsActive: 1
+--- !u!114 &394169809
+MonoBehaviour:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 394169808}
+  m_Enabled: 1
+  m_EditorHideFlags: 0
+  m_Script: {fileID: 11500000, guid: 7085c38898e09a544a02289a19100b15, type: 3}
+  m_Name: 
+  m_EditorClassIdentifier: 
+  enemies:
+  - {fileID: 8858115118599407935, guid: 0544746d8d75bd5418b91f18a6bb76d8, type: 3}
+  - {fileID: 158588537539433522, guid: 5ef24563203b2244d9dd9b6629c87918, type: 3}
+  - {fileID: 2393917128202386575, guid: c1658ae53f404f441add6603f0cd611c, type: 3}
+  - {fileID: 1752730237734195481, guid: a21068a05f2b52a4eb63fb964f157f7f, type: 3}
+  - {fileID: 6072309250277799118, guid: b258d19c9ed1c11488d29269a2fd8230, type: 3}
+  items:
+  - {fileID: 11400000, guid: babe569a6777d2f4394e68054b27be44, type: 2}
+  - {fileID: 11400000, guid: 14b4d32eafec57948a61b56e557e110d, type: 2}
+  - {fileID: 11400000, guid: 952901d81653e2142bc807fed65c739b, type: 2}
+  - {fileID: 11400000, guid: ba453795322502b41a8244bc8a934ce1, type: 2}
+  - {fileID: 11400000, guid: 69adf0cba734cba418b4cad07d010331, type: 2}
+  - {fileID: 11400000, guid: 2aaf85958bcbce44a8e79c60d106099c, type: 2}
+  - {fileID: 11400000, guid: b9030245bb3ac0f45ad7b92c3005d3c7, type: 2}
+  - {fileID: 11400000, guid: 2b9e0d5ec54ff4044a3b70d037f2f377, type: 2}
+  - {fileID: 11400000, guid: ea9c7ef8aef98cb489f5feee895d86ec, type: 2}
+--- !u!4 &394169810
+Transform:
+  m_ObjectHideFlags: 0
+  m_CorrespondingSourceObject: {fileID: 0}
+  m_PrefabInstance: {fileID: 0}
+  m_PrefabAsset: {fileID: 0}
+  m_GameObject: {fileID: 394169808}
+  m_LocalRotation: {x: 0, y: 0, z: 0, w: 1}
+  m_LocalPosition: {x: 2.2888355, y: 0.7136831, z: -784.4612}
+  m_LocalScale: {x: 1, y: 1, z: 1}
+  m_Children: []
+  m_Father: {fileID: 0}
+  m_RootOrder: 6
+  m_LocalEulerAnglesHint: {x: 0, y: 0, z: 0}
 --- !u!1 &542174868
 GameObject:
   m_ObjectHideFlags: 0
@@ -1792,13 +1851,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b6ade68b1d87e64fa2cea841350f35a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  money: 100
+  money: 200
   experience: 0
   level: 1
   playerName: Player
   baseStats:
   - name: health
-    value: 30
+    value: 50
   - name: attack
     value: 10
   - name: defense
@@ -1866,6 +1925,10 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   inventory: []
   equipment: []
+  shopItems:
+  - {fileID: 0}
+  - {fileID: 0}
+  - {fileID: 0}
 --- !u!1 &1910636530
 GameObject:
   m_ObjectHideFlags: 0

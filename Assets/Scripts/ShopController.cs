@@ -13,14 +13,13 @@ public class ShopController : MonoBehaviour
 
     public Text playerCurrency;
 
-    Item[] shopItems;
-
     Slot[] slots;
     Text[] prices;
     Button[] buyButtons;
 
     PlayerData playerData;
     InventoryData invData;
+    Registry registry;
 
     Tooltip tooltip;
 
@@ -34,7 +33,9 @@ public class ShopController : MonoBehaviour
         if (invObj)
             invData = invObj.GetComponent<InventoryData>();
 
-        shopItems = new Item[shopSlotObjs.Length];
+        GameObject regObj = GameObject.Find("Registry");
+        if (regObj)
+            registry = regObj.GetComponent<Registry>();
 
         slots = new Slot[shopSlotObjs.Length];
         prices = new Text[shopSlotObjs.Length];
@@ -69,38 +70,52 @@ public class ShopController : MonoBehaviour
     {
         playerCurrency.text = String.Format("${0}", playerData.money);
 
-        for (int i = 0; i < shopItems.Length; i++)
+        for (int i = 0; i < invData.shopItems.Length; i++)
         {
             slots[i].RemoveItem();
             prices[i].text = "---";
-            if (shopItems[i])
+            if (invData.shopItems[i])
             {
-                prices[i].text = String.Format("${0}", shopItems[i].price);
-                slots[i].AddItem(shopItems[i]);
+                prices[i].text = String.Format("${0}", invData.shopItems[i].price);
+                slots[i].AddItem(invData.shopItems[i]);
             }
         }
     }
 
     void GenerateItems()
     {
-        // TODO: Make a random loot generation function
-        shopItems[0] = Resources.Load<Item>("Items/BasicHead");
-        shopItems[1] = Resources.Load<Item>("Items/BasicBody");
-        shopItems[2] = Resources.Load<Item>("Items/BasicLegs");
+        if (playerData.refreshShop)
+        {
+            playerData.refreshShop = false;
+
+            List<int> itemIds = new List<int>();
+            for (int i = 0; i < 3; i++)
+            {
+                int id = UnityEngine.Random.Range(0, registry.items.Count);
+
+                while (itemIds.Contains(id))
+                {
+                    id = UnityEngine.Random.Range(0, registry.items.Count);
+                }
+
+                itemIds.Add(id);
+                invData.shopItems[i] = Instantiate(registry.items[id]);
+            }
+        }
     }
 
     public void BuyItem(int slot)
     {
-        if (playerData.money < shopItems[slot].price)
+        if (playerData.money < invData.shopItems[slot].price)
         {
             moneyWarning.SetActive(true);
             return;
         }
 
-        playerData.money -= shopItems[slot].price;
+        playerData.money -= invData.shopItems[slot].price;
 
-        invData.AddItem(shopItems[slot]);
-        shopItems[slot] = null;
+        invData.AddItem(invData.shopItems[slot]);
+        invData.shopItems[slot] = null;
         buyButtons[slot].interactable = false;
 
         moneyWarning.SetActive(false);
@@ -111,7 +126,7 @@ public class ShopController : MonoBehaviour
     {
         if (entered)
         {
-            tooltip.UpdateItem(shopItems[id]);
+            tooltip.UpdateItem(invData.shopItems[id]);
         }
         else
         {

@@ -31,8 +31,9 @@ public class BattleController : MonoBehaviour
 
     PlayerData playerData;
     InventoryData invData;
+    Registry registry;
 
-    int moneyReward = 100;
+    int moneyReward = 500;
     int expReward = 100;
 
     void Start()
@@ -46,6 +47,10 @@ public class BattleController : MonoBehaviour
         GameObject invDataObj = GameObject.Find("InventoryData");
         if (invDataObj)
             invData = invDataObj.GetComponent<InventoryData>();
+
+        GameObject regObj = GameObject.Find("Registry");
+        if (regObj)
+            registry = regObj.GetComponent<Registry>();
 
         StartCoroutine(SetupBattle());
     }
@@ -200,6 +205,7 @@ public class BattleController : MonoBehaviour
             bool lvl = playerData.GainEXP(expReward);
             playerData.GainMoney(moneyReward);
             playerData.battlesWon++;
+            playerData.refreshShop = true;
 
             victoryHUD.UpdateHUD(moneyReward, expReward, lvl);
             victoryHUD.SetVisible(true);
@@ -306,7 +312,7 @@ public class BattleController : MonoBehaviour
 
     private void LoadEnemy()
     {
-        enemy = Instantiate(Resources.Load<GameObject>("Prefabs/EnemyDrone"), enemyPosition);
+        enemy = Instantiate(registry.enemies[4], enemyPosition);
 
         enemyActor = enemy.GetComponent<BattleActor>();
         enemyActor.AddLevelBonus();

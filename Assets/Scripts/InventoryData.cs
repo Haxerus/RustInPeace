@@ -7,6 +7,8 @@ public class InventoryData : MonoBehaviour
     [SerializeField] private Item[] inventory;
     [SerializeField] private Item[] equipment;
 
+    public Item[] shopItems = new Item[3];
+
     private static GameObject instance;
 
     void Start()

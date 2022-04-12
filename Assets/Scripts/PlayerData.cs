@@ -10,9 +10,10 @@ public class PlayerData : MonoBehaviour
     public int experience;
     public int level;
     public string playerName;
-
     public int moneyEarned { get; set; }
     public int battlesWon { get; set; }
+
+    public bool refreshShop { get; set; } = true;
 
     // Base battle stats
     public List<Stat> baseStats;
