@@ -7,6 +7,6 @@ public class DefendBuff : Buff
     public override void Effect()
     {
         statChanges.Clear();
-        statChanges.Add(new Stat { name = "dmgReduction", value = 50 });
+        statChanges.Add(new Stat { name = "armor", value = 50 });
     }
 }

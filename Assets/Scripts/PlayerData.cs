@@ -28,4 +28,27 @@ public class PlayerData : MonoBehaviour
             Destroy(gameObject);
         }
     }
+
+    public void GainMoney(int m)
+    {
+        money += m;
+    }
+
+    public bool GainEXP(int xp)
+    {
+        experience += xp;
+
+        if (experience >= EXPToNextLevel())
+        {
+            level++;
+            return true;
+        }
+
+        return false;
+    }
+
+    public int EXPToNextLevel()
+    {
+        return level * 100;
+    }
 }

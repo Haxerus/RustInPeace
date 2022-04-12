@@ -45,13 +45,14 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   displayName: Skybit
+  level: 1
   actions:
+  - {fileID: 1295419766949053647, guid: 2a6d1e84a85ff074c849b4a0bc1ddc6c, type: 3}
   - {fileID: 4039537996948131066, guid: aac7a76049c68c64195714e35e6cf880, type: 3}
-  - {fileID: 4039537996948131066, guid: aac7a76049c68c64195714e35e6cf880, type: 3}
-  - {fileID: 4039537996948131066, guid: aac7a76049c68c64195714e35e6cf880, type: 3}
+  - {fileID: -6096235519615094503, guid: 8092e8a1678e16e46a6fa77990f93776, type: 3}
   stats:
   - name: health
-    value: 100
+    value: 50
   - name: attack
     value: 2
   - name: defense

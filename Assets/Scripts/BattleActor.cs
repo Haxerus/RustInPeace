@@ -10,16 +10,20 @@ public class BattleActor : MonoBehaviour
     public int maxHP { get; set; }
     public int currentHP { get; set; }
 
+    public int level;
+
     public List<Action> actions;
     public List<Stat> stats;
+    
 
-    List<Buff> buffs = new List<Buff>();
+    public List<Buff> buffs { get; set; }
+    public List<Stat> statChanges { get; set; }
 
     bool dead;
 
     void Start()
     {
-
+        buffs = new List<Buff>();
     }
 
     public void LoadStats(List<Stat> _stats)
@@ -29,28 +33,12 @@ public class BattleActor : MonoBehaviour
             if (stats.Exists(x => x.name == s.name))
                 continue;
 
-            Stat newStat = new Stat { name = s.name, value = s.value };
-            stats.Add(newStat);
-        }
-
-        maxHP = 1;
-        currentHP = 1;
-
-        Stat hp = stats.Find(x => x.name == "health");
-
-        if (hp != null)
-        {
-
-            maxHP = hp.value;
-            currentHP = hp.value;
+            stats.Add(new Stat { name = s.name, value = s.value });
         }
     }
 
     public void UpdateHealth()
     {
-        maxHP = 1;
-        currentHP = 1;
-
         Stat hp = stats.Find(x => x.name == "health");
 
         if (hp != null)
@@ -64,7 +52,21 @@ public class BattleActor : MonoBehaviour
     {
         Stat stat = stats.Find(x => x.name == statName);
         if (stat == null)
+        {
+            // Try finding it in the buffs
+            foreach (Buff b in buffs)
+            {
+                foreach (Stat s in b.GetStatChanges())
+                {
+                    if (s.name == statName)
+                    {
+                        return s.value;
+                    }
+                }
+            }
+
             return 0;
+        }
 
         Stat modStat = new Stat
         {
@@ -74,7 +76,7 @@ public class BattleActor : MonoBehaviour
         
         foreach (Buff b in buffs)
         {
-            foreach (Stat s in b.GetStats())
+            foreach (Stat s in b.GetStatChanges())
             {
                 if (modStat.name == s.name)
                 {
@@ -86,6 +88,19 @@ public class BattleActor : MonoBehaviour
         return modStat.value;
     }
 
+    public void AddLevelBonus()
+    {
+        Stat hp = stats.Find(x => x.name == "health");
+        Stat attack = stats.Find(x => x.name == "attack");
+        Stat defense = stats.Find(x => x.name == "defense");
+        Stat speed = stats.Find(x => x.name == "speed");
+
+        hp.value += 10 * level;
+        attack.value += 2 * level;
+        defense.value += 2 * level;
+        speed.value += 2 * level;
+    }
+
     public float GetCritChance()
     {
         float chance = 0f;
@@ -93,8 +108,27 @@ public class BattleActor : MonoBehaviour
         int crit = stats.Find(x => x.name == "crit").value;
         int speed = stats.Find(x => x.name == "speed").value;
 
-        chance += 1.0f - 1.0f / (1.0f + 0.01f * speed);
-        chance += crit;
+        foreach (Buff b in buffs)
+        {
+            Stat critBuff = b.GetStatChanges().Find(s => s.name == "crit");
+            Stat spdBuff = b.GetStatChanges().Find(s => s.name == "speed");
+
+            if (critBuff != null)
+                crit += critBuff.value;
+
+            if (spdBuff != null)
+                speed += spdBuff.value;
+                speed += spdBuff.value;
+        }
+
+        float spdMod = 1.0f - 1.0f / (1.0f + 0.001f * speed);
+
+        Debug.Log(spdMod);
+
+        chance += spdMod;
+        chance += crit / 100f;
+
+        Debug.Log(chance);
 
         return chance;
     }

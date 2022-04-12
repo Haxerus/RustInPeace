@@ -45,4 +45,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: DefendBuff
   duration: 1
-  buffIcon: {fileID: 0}
+  icon: {fileID: 21300000, guid: eefbeda072534b94cbdc21cc9cae5f68, type: 3}

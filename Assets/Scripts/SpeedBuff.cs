@@ -7,6 +7,6 @@ public class SpeedBuff : Buff
     public override void Effect()
     {
         statChanges.Clear();
-        statChanges.Add(new Stat { name = "speed", value = 10});
+        statChanges.Add(new Stat { name = "speed", value = 20});
     }
 }

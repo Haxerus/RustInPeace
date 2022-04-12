@@ -45,4 +45,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: SpeedBuff
   duration: 3
-  statChanges: []
+  icon: {fileID: 21300000, guid: 2b2a5299135cc614ab17d720f38b79c9, type: 3}

@@ -45,4 +45,4 @@ MonoBehaviour:
   m_EditorClassIdentifier: 
   name: BurnDebuff
   duration: 5
-  buffIcon: {fileID: 0}
+  icon: {fileID: 21300000, guid: 2ff147810e6dde845b0607f81e70ee13, type: 3}

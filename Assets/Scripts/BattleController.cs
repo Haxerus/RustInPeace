@@ -20,6 +20,9 @@ public class BattleController : MonoBehaviour
 
     public ActionHUD actionHUD;
 
+    public VictoryHUD victoryHUD;
+    public GameObject lossHUD;
+
     GameObject player;
     GameObject enemy;
 
@@ -28,6 +31,9 @@ public class BattleController : MonoBehaviour
 
     PlayerData playerData;
     InventoryData invData;
+
+    int moneyReward = 100;
+    int expReward = 100;
 
     void Start()
     {
@@ -46,6 +52,19 @@ public class BattleController : MonoBehaviour
 
     void RefreshUI()
     {
+        playerHUD.ClearBuffIcons();
+        enemyHUD.ClearBuffIcons();
+
+        foreach (Buff b in playerActor.buffs)
+        {
+            playerHUD.AddBuffIcon(b);
+        }
+
+        foreach (Buff b in enemyActor.buffs)
+        {
+            enemyHUD.AddBuffIcon(b);
+        }
+
         playerHUD.SetHP(playerActor.currentHP);
         enemyHUD.SetHP(enemyActor.currentHP);
     }
@@ -61,6 +80,9 @@ public class BattleController : MonoBehaviour
         enemyHUD.SetHUD(enemyActor);
 
         actionHUD.SetActions(playerActor.actions);
+
+        victoryHUD.SetVisible(false);
+        lossHUD.SetActive(false);
 
         yield return new WaitForSeconds(2f);
 
@@ -129,7 +151,7 @@ public class BattleController : MonoBehaviour
             }
         }
 
-        yield return new WaitForSeconds(0.5f);
+        yield return new WaitForSeconds(1f);
 
         playerActor.ProcessBuffs();
         enemyActor.ProcessBuffs();
@@ -164,11 +186,18 @@ public class BattleController : MonoBehaviour
     {
         if (state == BattleState.WON)
         {
-            battleText.text = "You won!";
+            battleText.text = string.Format("{0} was defeated! You won!", enemyActor.displayName);
+
+            bool lvl = playerData.GainEXP(expReward);
+            playerData.GainMoney(moneyReward);
+
+            victoryHUD.UpdateHUD(moneyReward, expReward, lvl);
+            victoryHUD.SetVisible(true);
         }
         else if (state == BattleState.LOST)
         {
-            battleText.text = "The battle was lost...";
+            battleText.text = "You were defeated. The battle was lost...";
+            lossHUD.SetActive(false);
         }
     }
 
@@ -184,6 +213,11 @@ public class BattleController : MonoBehaviour
 
     public void BackToMain() {
         SceneManager.LoadScene("MainScene");
+    }
+
+    public void ViewLeaderboard()
+    {
+        SceneManager.LoadScene("LeaderboardScene");
     }
 
     private IEnumerator DisplayActionText(BattleActor user, Action action)
@@ -216,48 +250,48 @@ public class BattleController : MonoBehaviour
         if (invData.GetEquipment(2))
             legs = invData.GetEquipment(2) as Equipment;
 
-        List<Stat> modifiedStats = new List<Stat>(playerData.baseStats);
+        List<Stat> modifiedStats = new List<Stat>();
 
-        if (head != null)
+        foreach (Stat s in playerData.baseStats)
         {
-            foreach (Stat s in head.stats)
-            {
-                Stat match = modifiedStats.Find(x => x.name == s.name);
-                if (match != null)
-                {
-                    match.value += s.value;
-                }
-            }
+            modifiedStats.Add(new Stat { name=s.name, value=s.value });
         }
 
-        if (body != null)
-        {
-            foreach (Stat s in body.stats)
-            {
-                Stat match = modifiedStats.Find(x => x.name == s.name);
-                if (match != null)
-                {
-                    match.value += s.value;
-                }
-            }
-        }
-        
-        if (legs != null)
-        {
-            foreach (Stat s in legs.stats)
-            {
-                Stat match = modifiedStats.Find(x => x.name == s.name);
-                if (match != null)
-                {
-                    match.value += s.value;
-                }
-            }
-        }
+        ApplyEquipmentStats(head, modifiedStats);
+        ApplyEquipmentStats(body, modifiedStats);
+        ApplyEquipmentStats(legs, modifiedStats);
 
         playerActor = player.GetComponent<BattleActor>();
 
         playerActor.displayName = playerData.playerName;
+        playerActor.level = playerData.level;
         playerActor.LoadStats(modifiedStats);
+        playerActor.AddLevelBonus();
+        playerActor.UpdateHealth();
+    }
+
+    private void ApplyEquipmentStats(Equipment eq, List<Stat> stats)
+    {
+        if (eq != null)
+        {
+            if (eq.action != null)
+            {
+                int actionIdx = playerActor.actions.FindIndex(a => a.type == eq.action.type);
+
+                if (actionIdx != -1)
+                    playerActor.actions[actionIdx] = eq.action;
+            }
+            
+
+            foreach (Stat s in eq.stats)
+            {
+                Stat match = stats.Find(x => x.name == s.name);
+                if (match != null)
+                {
+                    match.value += s.value;
+                }
+            }
+        }
     }
 
     private void LoadEnemy()
@@ -265,6 +299,7 @@ public class BattleController : MonoBehaviour
         enemy = Instantiate(Resources.Load<GameObject>("Prefabs/EnemyDrone"), enemyPosition);
 
         enemyActor = enemy.GetComponent<BattleActor>();
+        enemyActor.AddLevelBonus();
         enemyActor.UpdateHealth();
     }
 }
