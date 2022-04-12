@@ -43,13 +43,15 @@ public class PlayerData : MonoBehaviour
     {
         experience += xp;
 
-        if (experience >= EXPToNextLevel())
+        bool lvl = false;
+
+        while (experience >= EXPToNextLevel())
         {
             level++;
-            return true;
+            lvl = true;
         }
 
-        return false;
+        return lvl;
     }
 
     public int EXPToNextLevel()
