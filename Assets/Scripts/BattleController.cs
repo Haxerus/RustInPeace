@@ -37,6 +37,12 @@ public class BattleController : MonoBehaviour
         StartCoroutine(SetupBattle());
     }
 
+    void RefreshUI()
+    {
+        playerHUD.SetHP(playerActor.currentHP);
+        enemyHUD.SetHP(enemyActor.currentHP);
+    }
+
     IEnumerator SetupBattle()
     {
         LoadPlayer();
@@ -54,108 +60,62 @@ public class BattleController : MonoBehaviour
         WaitForInput();
     }
 
-    IEnumerator PlayerTurn(Action action)
-    {
-        ExecuteAction(action, playerActor, enemyActor);
-        yield return new WaitForSeconds(1.0f);
-        enemyHUD.SetHP(enemyActor.currentHP);
-        yield return new WaitForSeconds(1.0f);
-    }
-
-    IEnumerator EnemyTurn(Action action)
-    {
-        ExecuteAction(action, enemyActor, playerActor);
-        yield return new WaitForSeconds(1.0f);
-        playerHUD.SetHP(playerActor.currentHP);
-        yield return new WaitForSeconds(1.0f);
-    }
-
-    void ExecuteAction(Action action, BattleActor user, BattleActor target)
-    {
-        battleText.text = user.displayName + " used " + action.name + "!";
-        action.Effect(user, target);
-    }
-
     IEnumerator ProcessTurn(int action)
     {
         state = BattleState.TURN;
 
         Action playerAction = playerActor.actions[action];
+        playerAction.user = playerActor;
+        playerAction.target = enemyActor;
+
         Action enemyAction = enemyActor.actions[Random.Range(0, enemyActor.actions.Count)];
+        enemyAction.user = enemyActor;
+        enemyAction.target = playerActor;
 
-        // 0 = player first
-        // 1 = enemy first
-        // 2 = double counter
-        int turnOrder = 0;
+        Action first = playerAction;
+        Action second = enemyAction;
 
-        // Determine turn order based on speed
-        // Resolve speed ties with a coin flip
-        if (playerActor.GetModifiedSpeed() > enemyActor.GetModifiedSpeed())
-            turnOrder = 0;
-        else if (enemyActor.GetModifiedSpeed() > playerActor.GetModifiedSpeed())
-            turnOrder = 1;
-        else
-            turnOrder = Random.Range(0, 2) == 0 ? 0 : 1;
-
-        // Counterattacks have priority
-        if (playerAction.type == Action.ActionType.COUNTER && enemyAction.type == Action.ActionType.COUNTER)
-            turnOrder = 2;
-        else if (enemyAction.type == Action.ActionType.COUNTER && playerAction.type != Action.ActionType.COUNTER)
-            turnOrder = 1;
-        else if (playerAction.type == Action.ActionType.COUNTER && enemyAction.type != Action.ActionType.COUNTER)
-            turnOrder = 0;
-
-        switch (turnOrder)
+        // Decide turn order
+        if (enemyAction.type == Action.ActionType.DEFENSE)
         {
-            case 0:
-                yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
-
-                if (playerAction.type == Action.ActionType.COUNTER && enemyAction.type != Action.ActionType.ATTACK)
-                {
-                    yield return StartCoroutine(DisplayText("But it failed!"));
-                }
-                else
-                {
-                    playerAction.Effect(playerActor, enemyActor);
-                    enemyHUD.SetHP(enemyActor.currentHP);
-                }
-
-                if (!enemyActor.IsDead())
-                {
-                    yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
-                    enemyAction.Effect(enemyActor, playerActor);
-                    playerHUD.SetHP(playerActor.currentHP);
-                }
-
-                break;
-            case 1:
-                yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
-
-                if (enemyAction.type == Action.ActionType.COUNTER && playerAction.type != Action.ActionType.ATTACK)
-                {
-                    yield return StartCoroutine(DisplayText("But it failed!"));
-                }
-                else
-                {
-                    enemyAction.Effect(enemyActor, playerActor);
-                    playerHUD.SetHP(playerActor.currentHP);
-                }
-
-
-                if (!playerActor.IsDead())
-                {
-                    yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
-                    playerAction.Effect(playerActor, enemyActor);
-                    enemyHUD.SetHP(enemyActor.currentHP);
-                }
-
-                break;
-            case 2:
-                yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
-                yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
-                yield return StartCoroutine(DisplayText("But nothing happened!"));
-                break;
+            first = enemyAction;
+            second = playerAction;
         }
+
+        if (playerAction.type == Action.ActionType.DEFENSE)
+        {
+            first = playerAction;
+            second = enemyAction;
+        }
+
+        if (enemyAction.type == Action.ActionType.SPEED)
+        {
+            first = enemyAction;
+            second = playerAction;
+        }
+
+        if (playerAction.type == Action.ActionType.SPEED)
+        {
+            first = playerAction;
+            second = enemyAction;
+        }
+
+        // Execute actions
+
+        yield return StartCoroutine(DisplayActionText(first.user, first));
+
+        first.Effect();
+        RefreshUI();
+
+        if (!second.user.IsDead())
+        {
+            yield return StartCoroutine(DisplayActionText(second.user, second));
+
+            second.Effect();
+            RefreshUI();
+        }
+
+        // End of Turn
 
         if (playerActor.IsDead())
             state = BattleState.LOST;

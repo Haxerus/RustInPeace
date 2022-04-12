@@ -6,7 +6,7 @@ public class BasicDefendAction : Action
 {
     public int defense;
 
-    public override void Effect(BattleActor user, BattleActor target)
+    public override void Effect()
     {
         user.ModifyDefense(defense);
     }
