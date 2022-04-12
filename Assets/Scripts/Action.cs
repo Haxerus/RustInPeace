@@ -6,8 +6,7 @@ public abstract class Action : MonoBehaviour
 {
     public new string name;
     public ActionType type;
-
-    public enum ActionType { ATTACK, DEFENSE, COUNTER, SPECIAL }
+    public enum ActionType { ATTACK, DEFENSE, SPEED, SPECIAL }
 
     public abstract void Effect(BattleActor user, BattleActor target);
 }

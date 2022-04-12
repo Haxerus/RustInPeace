@@ -36,6 +36,9 @@ public class Tooltip : MonoBehaviour
                 string modText = String.Format("{0}: {1}{2}", s.name, sign, s.value);
                 text.text = modText;
             }
+
+            if (eq.action != null)
+                AddActionModText(eq.action);
         }
     }
 
@@ -57,5 +60,15 @@ public class Tooltip : MonoBehaviour
         {
             Destroy(child.gameObject);
         }
+    }
+
+    private void AddActionModText(Action a)
+    {
+        GameObject mod = Instantiate(modifierText, statGroup.transform);
+
+        Text text = mod.GetComponent<Text>();
+
+        string modText = String.Format("Upgrades your {} action to {}", a.type.ToString(), a.name);
+        text.text = modText;
     }
 }

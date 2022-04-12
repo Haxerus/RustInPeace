@@ -1,20 +1,21 @@
 using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
+using UnityEngine.UI;
 
 public class PlayerData : MonoBehaviour
 {
     // Globally persistent stats
-    public int money { get; set; }
-    public int experience { get; set; }
-    public int level { get; set; }
-    public string playerName { get; set; }
+    public int money;
+    public int experience;
+    public int level;
+    public string playerName;
+
+    public int moneyEarned { get; set; }
+    public int battlesWon { get; set; }
 
     // Base battle stats
-    public int health { get; set; }
-    public int attack { get; set;  }
-    public int defense { get; set; }
-    public int speed { get; set; }
+    public List<Stat> baseStats;
 
     private static GameObject instance;
         
@@ -32,16 +33,27 @@ public class PlayerData : MonoBehaviour
         }
     }
 
-    void Start()
+    public void GainMoney(int m)
     {
-        playerName = "Player";
-        money = 100;
-        experience = 0;
-        level = 1;
+        money += m;
+        moneyEarned += m;
+    }
 
-        health = 20;
-        attack = 5;
-        defense = 5;
-        speed = 5;
+    public bool GainEXP(int xp)
+    {
+        experience += xp;
+
+        if (experience >= EXPToNextLevel())
+        {
+            level++;
+            return true;
+        }
+
+        return false;
+    }
+
+    public int EXPToNextLevel()
+    {
+        return level * 100;
     }
 }

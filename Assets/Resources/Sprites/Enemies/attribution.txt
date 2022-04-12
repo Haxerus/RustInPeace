@@ -1,0 +1,5 @@
+Sprites for project 'Rust in Peace' used from
+<a href="https://www.freepik.com/vectors/robot">Robot vector created by upklyak - www.freepik.com</a>
+
+Non-commercial liciensing allowed under guidelines from freepik.com
+agreement fullfilled by attibuting original image source, as stated in this document.

@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -19,6 +20,9 @@ public class BattleController : MonoBehaviour
 
     public ActionHUD actionHUD;
 
+    public VictoryHUD victoryHUD;
+    public GameObject lossHUD;
+
     GameObject player;
     GameObject enemy;
 
@@ -26,15 +30,43 @@ public class BattleController : MonoBehaviour
     BattleActor enemyActor;
 
     PlayerData playerData;
+    InventoryData invData;
+
+    int moneyReward = 100;
+    int expReward = 100;
 
     void Start()
     {
         state = BattleState.START;
 
         GameObject playerDataObj = GameObject.Find("PlayerData");
-        playerData = playerDataObj.GetComponent<PlayerData>();
+        if (playerDataObj)
+            playerData = playerDataObj.GetComponent<PlayerData>();
+
+        GameObject invDataObj = GameObject.Find("InventoryData");
+        if (invDataObj)
+            invData = invDataObj.GetComponent<InventoryData>();
 
         StartCoroutine(SetupBattle());
+    }
+
+    void RefreshUI()
+    {
+        playerHUD.ClearBuffIcons();
+        enemyHUD.ClearBuffIcons();
+
+        foreach (Buff b in playerActor.buffs)
+        {
+            playerHUD.AddBuffIcon(b);
+        }
+
+        foreach (Buff b in enemyActor.buffs)
+        {
+            enemyHUD.AddBuffIcon(b);
+        }
+
+        playerHUD.SetHP(playerActor.currentHP);
+        enemyHUD.SetHP(enemyActor.currentHP);
     }
 
     IEnumerator SetupBattle()
@@ -49,31 +81,12 @@ public class BattleController : MonoBehaviour
 
         actionHUD.SetActions(playerActor.actions);
 
+        victoryHUD.SetVisible(false);
+        lossHUD.SetActive(false);
+
         yield return new WaitForSeconds(2f);
 
         WaitForInput();
-    }
-
-    IEnumerator PlayerTurn(Action action)
-    {
-        ExecuteAction(action, playerActor, enemyActor);
-        yield return new WaitForSeconds(1.0f);
-        enemyHUD.SetHP(enemyActor.currentHP);
-        yield return new WaitForSeconds(1.0f);
-    }
-
-    IEnumerator EnemyTurn(Action action)
-    {
-        ExecuteAction(action, enemyActor, playerActor);
-        yield return new WaitForSeconds(1.0f);
-        playerHUD.SetHP(playerActor.currentHP);
-        yield return new WaitForSeconds(1.0f);
-    }
-
-    void ExecuteAction(Action action, BattleActor user, BattleActor target)
-    {
-        battleText.text = user.displayName + " used " + action.name + "!";
-        action.Effect(user, target);
     }
 
     IEnumerator ProcessTurn(int action)
@@ -83,79 +96,68 @@ public class BattleController : MonoBehaviour
         Action playerAction = playerActor.actions[action];
         Action enemyAction = enemyActor.actions[Random.Range(0, enemyActor.actions.Count)];
 
-        // 0 = player first
-        // 1 = enemy first
-        // 2 = double counter
-        int turnOrder = 0;
+        // Decide turn order
+        bool playerFirst = true;
 
-        // Determine turn order based on speed
-        // Resolve speed ties with a coin flip
-        if (playerActor.GetModifiedSpeed() > enemyActor.GetModifiedSpeed())
-            turnOrder = 0;
-        else if (enemyActor.GetModifiedSpeed() > playerActor.GetModifiedSpeed())
-            turnOrder = 1;
-        else
-            turnOrder = Random.Range(0, 2) == 0 ? 0 : 1;
-
-        // Counterattacks have priority
-        if (playerAction.type == Action.ActionType.COUNTER && enemyAction.type == Action.ActionType.COUNTER)
-            turnOrder = 2;
-        else if (enemyAction.type == Action.ActionType.COUNTER && playerAction.type != Action.ActionType.COUNTER)
-            turnOrder = 1;
-        else if (playerAction.type == Action.ActionType.COUNTER && enemyAction.type != Action.ActionType.COUNTER)
-            turnOrder = 0;
-
-        switch (turnOrder)
+        if (enemyAction.type == Action.ActionType.DEFENSE)
         {
-            case 0:
-                yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
-
-                if (playerAction.type == Action.ActionType.COUNTER && enemyAction.type != Action.ActionType.ATTACK)
-                {
-                    yield return StartCoroutine(DisplayText("But it failed!"));
-                }
-                else
-                {
-                    playerAction.Effect(playerActor, enemyActor);
-                    enemyHUD.SetHP(enemyActor.currentHP);
-                }
-
-                if (!enemyActor.IsDead())
-                {
-                    yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
-                    enemyAction.Effect(enemyActor, playerActor);
-                    playerHUD.SetHP(playerActor.currentHP);
-                }
-
-                break;
-            case 1:
-                yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
-
-                if (enemyAction.type == Action.ActionType.COUNTER && playerAction.type != Action.ActionType.ATTACK)
-                {
-                    yield return StartCoroutine(DisplayText("But it failed!"));
-                }
-                else
-                {
-                    enemyAction.Effect(enemyActor, playerActor);
-                    playerHUD.SetHP(playerActor.currentHP);
-                }
-
-
-                if (!playerActor.IsDead())
-                {
-                    yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
-                    playerAction.Effect(playerActor, enemyActor);
-                    enemyHUD.SetHP(enemyActor.currentHP);
-                }
-
-                break;
-            case 2:
-                yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
-                yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
-                yield return StartCoroutine(DisplayText("But nothing happened!"));
-                break;
+            playerFirst = false;
         }
+
+        if (playerAction.type == Action.ActionType.DEFENSE)
+        {
+            playerFirst = true;
+        }
+
+        if (enemyAction.type == Action.ActionType.SPEED)
+        {
+            playerFirst = false;
+        }
+
+        if (playerAction.type == Action.ActionType.SPEED)
+        {
+            playerFirst = true;
+        }
+
+        // Execute actions
+        if (playerFirst)
+        {
+            yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
+
+            playerAction.Effect(playerActor, enemyActor);
+            RefreshUI();
+
+            if (!enemyActor.IsDead())
+            {
+                yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
+
+                enemyAction.Effect(enemyActor, playerActor);
+                RefreshUI();
+            }
+        }
+        else
+        {
+            yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
+
+            enemyAction.Effect(enemyActor, playerActor);
+            RefreshUI();
+
+            if (!playerActor.IsDead())
+            {
+                yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
+
+                playerAction.Effect(playerActor, enemyActor);
+                RefreshUI();
+            }
+        }
+
+        yield return new WaitForSeconds(1f);
+
+        playerActor.ProcessBuffs();
+        enemyActor.ProcessBuffs();
+        RefreshUI();
+
+        // End of Turn
 
         if (playerActor.IsDead())
             state = BattleState.LOST;
@@ -184,11 +186,19 @@ public class BattleController : MonoBehaviour
     {
         if (state == BattleState.WON)
         {
-            battleText.text = "You won!";
+            battleText.text = string.Format("{0} was defeated! You won!", enemyActor.displayName);
+
+            bool lvl = playerData.GainEXP(expReward);
+            playerData.GainMoney(moneyReward);
+            playerData.battlesWon++;
+
+            victoryHUD.UpdateHUD(moneyReward, expReward, lvl);
+            victoryHUD.SetVisible(true);
         }
         else if (state == BattleState.LOST)
         {
-            battleText.text = "The battle was lost...";
+            battleText.text = "You were defeated. The battle was lost...";
+            lossHUD.SetActive(true);
         }
     }
 
@@ -206,6 +216,11 @@ public class BattleController : MonoBehaviour
         SceneManager.LoadScene("MainScene");
     }
 
+    public void ViewLeaderboard()
+    {
+        SceneManager.LoadScene("LeaderboardScene");
+    }
+
     private IEnumerator DisplayActionText(BattleActor user, Action action)
     {
         battleText.text = user.displayName + " used " + action.name + "!";
@@ -220,24 +235,72 @@ public class BattleController : MonoBehaviour
 
     private void LoadPlayer()
     {
-        player = Resources.Load<GameObject>("Prefabs/Player");
-        Instantiate(player, playerPosition);
+        player = Instantiate(Resources.Load<GameObject>("Prefabs/Player"), playerPosition);
+
+        // Apply stats from equipment
+        Equipment head = null;
+        Equipment body = null;
+        Equipment legs = null;
+
+        if (invData.GetEquipment(0))
+            legs = invData.GetEquipment(0) as Equipment;
+
+        if (invData.GetEquipment(1))
+            body = invData.GetEquipment(1) as Equipment;
+
+        if (invData.GetEquipment(2))
+            legs = invData.GetEquipment(2) as Equipment;
+
+        List<Stat> modifiedStats = new List<Stat>();
+
+        foreach (Stat s in playerData.baseStats)
+        {
+            modifiedStats.Add(new Stat { name=s.name, value=s.value });
+        }
+
+        ApplyEquipmentStats(head, modifiedStats);
+        ApplyEquipmentStats(body, modifiedStats);
+        ApplyEquipmentStats(legs, modifiedStats);
 
         playerActor = player.GetComponent<BattleActor>();
 
         playerActor.displayName = playerData.playerName;
-        playerActor.maxHP = playerData.health;
-        playerActor.currentHP = playerData.health;
-        playerActor.attack = playerData.attack;
-        playerActor.defense = playerData.defense;
-        playerActor.speed = playerData.speed;
+        playerActor.level = playerData.level;
+        playerActor.LoadStats(modifiedStats);
+        playerActor.AddLevelBonus();
+        playerActor.UpdateHealth();
+    }
+
+    private void ApplyEquipmentStats(Equipment eq, List<Stat> stats)
+    {
+        if (eq != null)
+        {
+            if (eq.action != null)
+            {
+                int actionIdx = playerActor.actions.FindIndex(a => a.type == eq.action.type);
+
+                if (actionIdx != -1)
+                    playerActor.actions[actionIdx] = eq.action;
+            }
+            
+
+            foreach (Stat s in eq.stats)
+            {
+                Stat match = stats.Find(x => x.name == s.name);
+                if (match != null)
+                {
+                    match.value += s.value;
+                }
+            }
+        }
     }
 
     private void LoadEnemy()
     {
-        enemy = Resources.Load<GameObject>("Prefabs/EnemyDrone");
-        Instantiate(enemy, enemyPosition);
+        enemy = Instantiate(Resources.Load<GameObject>("Prefabs/EnemyDrone"), enemyPosition);
 
         enemyActor = enemy.GetComponent<BattleActor>();
+        enemyActor.AddLevelBonus();
+        enemyActor.UpdateHealth();
     }
 }
