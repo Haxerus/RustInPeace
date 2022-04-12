@@ -10,11 +10,21 @@ public class InventoryController : MonoBehaviour
 
     public GameObject tooltipObj;
 
+    public GameObject playerModel;
+
+    public Sprite defaultHeadSprite;
+    public Sprite defaultBodySprite;
+    public Sprite defaultLegsSprite;
+
     Slot[] slots;
 
     Slot head;
     Slot body;
     Slot legs;
+
+    Image headImage;
+    Image bodyImage;
+    Image legsImage;
 
     Slot cursorSlot;
     Item cursor;
@@ -33,6 +43,10 @@ public class InventoryController : MonoBehaviour
 
         cursorSlot = cursorSlotObj.GetComponent<Slot>();
         tooltip = tooltipObj.GetComponent<Tooltip>();
+
+        headImage = playerModel.transform.GetChild(0).gameObject.GetComponent<Image>();
+        bodyImage = playerModel.transform.GetChild(1).gameObject.GetComponent<Image>();
+        legsImage = playerModel.transform.GetChild(2).gameObject.GetComponent<Image>();
 
         int numSlots = GameObject.Find("Slots").transform.childCount;
         slots = new Slot[numSlots];
@@ -72,6 +86,10 @@ public class InventoryController : MonoBehaviour
 
     void RefreshUI()
     {
+        headImage.sprite = defaultHeadSprite;
+        bodyImage.sprite = defaultBodySprite;
+        legsImage.sprite = defaultLegsSprite;
+
         cursorSlot.RemoveItem();
         if (cursor)
             cursorSlot.AddItem(cursor);
@@ -85,15 +103,28 @@ public class InventoryController : MonoBehaviour
 
         head.RemoveItem();
         if (invData.GetEquipment(0))
-            head.AddItem(invData.GetEquipment(0));
+        {
+            Equipment eq = invData.GetEquipment(0) as Equipment;
+            head.AddItem(eq);
+            headImage.sprite = eq.equippedSprite;
+        }
+            
 
         body.RemoveItem();
         if (invData.GetEquipment(1))
-            body.AddItem(invData.GetEquipment(1));
+        {
+            Equipment eq = invData.GetEquipment(1) as Equipment;
+            body.AddItem(eq);
+            bodyImage.sprite = eq.equippedSprite;
+        }
 
         legs.RemoveItem();
         if (invData.GetEquipment(2))
-            legs.AddItem(invData.GetEquipment(2));
+        {
+            Equipment eq = invData.GetEquipment(2) as Equipment;
+            legs.AddItem(eq);
+            legsImage.sprite = eq.equippedSprite;
+        }
     }
 
     void ClickListener(int id)

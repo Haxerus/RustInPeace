@@ -12,11 +12,11 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e134620d6e73f498e39ac6f51dc446, type: 3}
   m_Name: BasicBody
   m_EditorClassIdentifier: 
-  name: Reinforced Chassis
+  name: Standard Body
   sprite: {fileID: 21300000, guid: e6c159361e9dce040ad1bc5ed243e750, type: 3}
-  price: 20
+  price: 50
   slot: 1
-  equippedSprite: {fileID: 21300000, guid: 344b32f656410074ba5856daacc6817b, type: 3}
+  equippedSprite: {fileID: 21300000, guid: e42d4e563bc5f4a4f80271ba9403066e, type: 3}
   stats:
   - name: defense
     value: 5

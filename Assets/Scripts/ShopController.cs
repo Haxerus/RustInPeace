@@ -9,6 +9,7 @@ public class ShopController : MonoBehaviour
 {
     public GameObject[] shopSlotObjs;
     public GameObject tooltipObj;
+    public GameObject moneyWarning;
 
     public Text playerCurrency;
 
@@ -51,6 +52,8 @@ public class ShopController : MonoBehaviour
         tooltipObj.SetActive(false);
         tooltip = tooltipObj.GetComponent<Tooltip>();
 
+        moneyWarning.SetActive(false);
+
         GenerateItems();
         RefreshUI();
     }
@@ -88,9 +91,19 @@ public class ShopController : MonoBehaviour
 
     public void BuyItem(int slot)
     {
+        if (playerData.money < shopItems[slot].price)
+        {
+            moneyWarning.SetActive(true);
+            return;
+        }
+
+        playerData.money -= shopItems[slot].price;
+
         invData.AddItem(shopItems[slot]);
         shopItems[slot] = null;
         buyButtons[slot].interactable = false;
+
+        moneyWarning.SetActive(false);
         RefreshUI();
     }
 

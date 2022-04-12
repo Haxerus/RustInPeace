@@ -12,9 +12,9 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 52e134620d6e73f498e39ac6f51dc446, type: 3}
   m_Name: BasicLegs
   m_EditorClassIdentifier: 
-  name: Overclocked Drive
+  name: Standard Legs
   sprite: {fileID: 21300000, guid: 8ce20ac805276e84cbc9d3de8ce190df, type: 3}
-  price: 20
+  price: 50
   slot: 2
   equippedSprite: {fileID: 21300000, guid: a0e09aecb0fb9654d994a7c0d1e4fb2e, type: 3}
   stats:
