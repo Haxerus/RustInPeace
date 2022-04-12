@@ -1,4 +1,5 @@
 using System.Collections;
+using System.Collections.Generic;
 using UnityEngine;
 using UnityEngine.SceneManagement;
 using UnityEngine.UI;
@@ -26,13 +27,19 @@ public class BattleController : MonoBehaviour
     BattleActor enemyActor;
 
     PlayerData playerData;
+    InventoryData invData;
 
     void Start()
     {
         state = BattleState.START;
 
         GameObject playerDataObj = GameObject.Find("PlayerData");
-        playerData = playerDataObj.GetComponent<PlayerData>();
+        if (playerDataObj)
+            playerData = playerDataObj.GetComponent<PlayerData>();
+
+        GameObject invDataObj = GameObject.Find("InventoryData");
+        if (invDataObj)
+            invData = invDataObj.GetComponent<InventoryData>();
 
         StartCoroutine(SetupBattle());
     }
@@ -65,55 +72,68 @@ public class BattleController : MonoBehaviour
         state = BattleState.TURN;
 
         Action playerAction = playerActor.actions[action];
-        playerAction.user = playerActor;
-        playerAction.target = enemyActor;
-
         Action enemyAction = enemyActor.actions[Random.Range(0, enemyActor.actions.Count)];
-        enemyAction.user = enemyActor;
-        enemyAction.target = playerActor;
-
-        Action first = playerAction;
-        Action second = enemyAction;
 
         // Decide turn order
+        bool playerFirst = true;
+
         if (enemyAction.type == Action.ActionType.DEFENSE)
         {
-            first = enemyAction;
-            second = playerAction;
+            playerFirst = false;
         }
 
         if (playerAction.type == Action.ActionType.DEFENSE)
         {
-            first = playerAction;
-            second = enemyAction;
+            playerFirst = true;
         }
 
         if (enemyAction.type == Action.ActionType.SPEED)
         {
-            first = enemyAction;
-            second = playerAction;
+            playerFirst = false;
         }
 
         if (playerAction.type == Action.ActionType.SPEED)
         {
-            first = playerAction;
-            second = enemyAction;
+            playerFirst = true;
         }
 
         // Execute actions
-
-        yield return StartCoroutine(DisplayActionText(first.user, first));
-
-        first.Effect();
-        RefreshUI();
-
-        if (!second.user.IsDead())
+        if (playerFirst)
         {
-            yield return StartCoroutine(DisplayActionText(second.user, second));
+            yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
 
-            second.Effect();
+            playerAction.Effect(playerActor, enemyActor);
             RefreshUI();
+
+            if (!enemyActor.IsDead())
+            {
+                yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
+
+                enemyAction.Effect(enemyActor, playerActor);
+                RefreshUI();
+            }
         }
+        else
+        {
+            yield return StartCoroutine(DisplayActionText(enemyActor, enemyAction));
+
+            enemyAction.Effect(enemyActor, playerActor);
+            RefreshUI();
+
+            if (!playerActor.IsDead())
+            {
+                yield return StartCoroutine(DisplayActionText(playerActor, playerAction));
+
+                playerAction.Effect(playerActor, enemyActor);
+                RefreshUI();
+            }
+        }
+
+        yield return new WaitForSeconds(0.5f);
+
+        playerActor.ProcessBuffs();
+        enemyActor.ProcessBuffs();
+        RefreshUI();
 
         // End of Turn
 
@@ -180,24 +200,71 @@ public class BattleController : MonoBehaviour
 
     private void LoadPlayer()
     {
-        player = Resources.Load<GameObject>("Prefabs/Player");
-        Instantiate(player, playerPosition);
+        player = Instantiate(Resources.Load<GameObject>("Prefabs/Player"), playerPosition);
+
+        // Apply stats from equipment
+        Equipment head = null;
+        Equipment body = null;
+        Equipment legs = null;
+
+        if (invData.GetEquipment(0))
+            legs = invData.GetEquipment(0) as Equipment;
+
+        if (invData.GetEquipment(1))
+            body = invData.GetEquipment(1) as Equipment;
+
+        if (invData.GetEquipment(2))
+            legs = invData.GetEquipment(2) as Equipment;
+
+        List<Stat> modifiedStats = new List<Stat>(playerData.baseStats);
+
+        if (head != null)
+        {
+            foreach (Stat s in head.stats)
+            {
+                Stat match = modifiedStats.Find(x => x.name == s.name);
+                if (match != null)
+                {
+                    match.value += s.value;
+                }
+            }
+        }
+
+        if (body != null)
+        {
+            foreach (Stat s in body.stats)
+            {
+                Stat match = modifiedStats.Find(x => x.name == s.name);
+                if (match != null)
+                {
+                    match.value += s.value;
+                }
+            }
+        }
+        
+        if (legs != null)
+        {
+            foreach (Stat s in legs.stats)
+            {
+                Stat match = modifiedStats.Find(x => x.name == s.name);
+                if (match != null)
+                {
+                    match.value += s.value;
+                }
+            }
+        }
 
         playerActor = player.GetComponent<BattleActor>();
 
         playerActor.displayName = playerData.playerName;
-        playerActor.maxHP = playerData.health;
-        playerActor.currentHP = playerData.health;
-        playerActor.attack = playerData.attack;
-        playerActor.defense = playerData.defense;
-        playerActor.speed = playerData.speed;
+        playerActor.LoadStats(modifiedStats);
     }
 
     private void LoadEnemy()
     {
-        enemy = Resources.Load<GameObject>("Prefabs/EnemyDrone");
-        Instantiate(enemy, enemyPosition);
+        enemy = Instantiate(Resources.Load<GameObject>("Prefabs/EnemyDrone"), enemyPosition);
 
         enemyActor = enemy.GetComponent<BattleActor>();
+        enemyActor.UpdateHealth();
     }
 }

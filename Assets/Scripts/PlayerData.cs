@@ -5,16 +5,13 @@ using UnityEngine;
 public class PlayerData : MonoBehaviour
 {
     // Globally persistent stats
-    public int money { get; set; }
-    public int experience { get; set; }
-    public int level { get; set; }
-    public string playerName { get; set; }
+    public int money;
+    public int experience;
+    public int level;
+    public string playerName;
 
     // Base battle stats
-    public int health { get; set; }
-    public int attack { get; set;  }
-    public int defense { get; set; }
-    public int speed { get; set; }
+    public List<Stat> baseStats;
 
     private static GameObject instance;
         
@@ -30,18 +27,5 @@ public class PlayerData : MonoBehaviour
         {
             Destroy(gameObject);
         }
-    }
-
-    void Start()
-    {
-        playerName = "Player";
-        money = 100;
-        experience = 0;
-        level = 1;
-
-        health = 20;
-        attack = 5;
-        defense = 5;
-        speed = 5;
     }
 }

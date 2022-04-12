@@ -44,16 +44,22 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 650228e1e5d94874a9bda1cbc493773e, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  displayName: R.U.S.T.Y.
-  maxHP: 10
-  currentHP: 10
-  attack: 1
-  defense: 1
-  speed: 1
+  displayName: Player
   actions:
   - {fileID: 1295419766949053647, guid: 2a6d1e84a85ff074c849b4a0bc1ddc6c, type: 3}
   - {fileID: 4039537996948131066, guid: aac7a76049c68c64195714e35e6cf880, type: 3}
   - {fileID: -6096235519615094503, guid: 8092e8a1678e16e46a6fa77990f93776, type: 3}
+  stats:
+  - name: health
+    value: 300
+  - name: attack
+    value: 10
+  - name: defense
+    value: 10
+  - name: speed
+    value: 10
+  - name: crit
+    value: 5
 --- !u!1001 &1549750896297629763
 PrefabInstance:
   m_ObjectHideFlags: 0
