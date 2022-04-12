@@ -9,6 +9,8 @@ public class Equipment : Item
     [Header("Equipment")]
     public EquipmentSlot slot;
 
+    public Sprite equippedSprite;
+
     public enum EquipmentSlot
     {
         HEAD,
@@ -17,4 +19,6 @@ public class Equipment : Item
     }
 
     public List<Stat> stats;
+
+    public Action action;
 }

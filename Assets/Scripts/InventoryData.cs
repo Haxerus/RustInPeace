@@ -14,12 +14,13 @@ public class InventoryData : MonoBehaviour
         inventory = new Item[25];
         equipment = new Item[3];
 
-        Item item = Resources.Load<Item>("Items/Tier1Head");
-        Item item2 = Resources.Load<Item>("Items/Tier1Body");
-        Item item3 = Resources.Load<Item>("Items/Tier1Legs");
+        // This is just for testing
+        /*Item item = Resources.Load<Item>("Items/BasicHead");
+        Item item2 = Resources.Load<Item>("Items/BasicBody");
+        Item item3 = Resources.Load<Item>("Items/BasicLegs");
         inventory[0] = item;
         inventory[1] = item2;
-        inventory[2] = item3;
+        inventory[2] = item3;*/
     }
 
     void Awake()
