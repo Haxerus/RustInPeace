@@ -54,11 +54,11 @@ MonoBehaviour:
   - name: health
     value: 300
   - name: attack
-    value: 10
+    value: 100
   - name: defense
-    value: 10
+    value: 100
   - name: speed
-    value: 10
+    value: 100
   - name: crit
     value: 5
 --- !u!1001 &1549750896297629763

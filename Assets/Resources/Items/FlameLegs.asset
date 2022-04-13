@@ -20,4 +20,4 @@ MonoBehaviour:
   stats:
   - name: speed
     value: 35
-  action: {fileID: 0}
+  action: {fileID: 1493805788791381748, guid: 4e80c1506e4369e4fbd53c62898462a9, type: 3}

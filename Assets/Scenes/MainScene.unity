@@ -1851,19 +1851,19 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: 1b6ade68b1d87e64fa2cea841350f35a, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  money: 200
+  money: 750
   experience: 0
   level: 1
   playerName: Player
   baseStats:
   - name: health
-    value: 50
+    value: 300
   - name: attack
-    value: 10
+    value: 100
   - name: defense
-    value: 10
+    value: 100
   - name: speed
-    value: 10
+    value: 100
   - name: crit
     value: 5
 --- !u!4 &1784947291

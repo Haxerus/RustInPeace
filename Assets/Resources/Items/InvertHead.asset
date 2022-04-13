@@ -20,4 +20,4 @@ MonoBehaviour:
   stats:
   - name: attack
     value: 30
-  action: {fileID: 0}
+  action: {fileID: 8140416840802754710, guid: 2cb19f3ccc924264c8aeec540b4f6494, type: 3}
